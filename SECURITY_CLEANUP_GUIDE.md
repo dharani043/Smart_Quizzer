@@ -24,7 +24,7 @@ Smart_Quizzer/
 
 **In `base/llm_client.py` - Replace:**
 ```python
-genai.configure(api_key="AIzaSyAr4zAzbPoB7UCzA9N8BwJCq5CQYMZQPFk")
+genai.configure(api_key="YOUR_API_KEY")
 ```
 
 **With:**
