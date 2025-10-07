@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartQuizzer - User Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{
+      background:var(--gradient);
+      color:var(--light);min-height:100vh;
+    }
+    .container{width:100%;max-width:1400px;margin:0 auto;padding:0 20px}
+    
+    /* Navigation */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    /* Dashboard Header */
+    .dashboard-header{margin-bottom:30px}
+    .header-content{display:flex;justify-content:space-between;align-items:center}
+    .welcome-text h1{font-size:2.2rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#bdf725);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .dashboard-actions a{color:white;text-decoration:none;margin-left:15px;padding:8px 15px;border-radius:20px;background:rgba(255,255,255,.2);transition:all .3s}
+    .dashboard-actions a:hover{background:rgba(255,255,255,.3)}
+    
+    /* Dashboard Grid */
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:25px;margin-bottom:40px}
+    .stat-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);text-align:center;transition:transform .3s;border:1px solid rgba(255,255,255,.1)}
+    .stat-card:hover{transform:translateY(-5px)}
+    .stat-card i{font-size:2.5rem;margin-bottom:15px}
+    .stat-card h3{font-size:1.2rem;margin-bottom:10px;color:rgba(255,255,255,.9)}
+    .stat-card .number{font-size:2.2rem;font-weight:700;color:#fff}
+    .card-1 i{color:var(--success)}
+    .card-2 i{color:var(--success)}
+    .card-3 i{color:var(--success)}
+    
+    /* Quick Actions */
+    .quick-actions{margin-bottom:40px}
+    .section-title{font-size:1.5rem;margin-bottom:20px;color:rgba(255,255,255,.9);padding-bottom:10px;border-bottom:2px solid rgba(255,255,255,.2)}
+    .action-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:20px}
+    .action-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);text-align:center;transition:all .3s;cursor:pointer;border:1px solid rgba(255,255,255,.1)}
+    .action-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+    .suggestion-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(76,201,240,.4)}
+    .action-card i{font-size:2rem;margin-bottom:15px;color:#f9c74f}
+    .action-card h3{font-size:1.2rem;margin-bottom:10px;color:rgba(255,255,255,.9)}
+    .action-card p{color:rgba(255,255,255,.7)}
+    
+    /* AI Suggestion Cards */
+    .suggestion-card{position:relative;border:2px solid transparent;background:linear-gradient(135deg,rgba(67,97,238,.2),rgba(118,75,162,.2))}
+    .suggestion-card.priority-high{border-color:#4cc9f0;box-shadow:0 0 20px rgba(76,201,240,.3)}
+    .suggestion-card.priority-medium{border-color:#f9c74f;box-shadow:0 0 15px rgba(249,199,79,.2)}
+    .suggestion-card.priority-low{border-color:#e63946;box-shadow:0 0 10px rgba(230,57,70,.1)}
+    .suggestion-icon{position:absolute;top:15px;right:15px;font-size:1.5rem}
+    .suggestion-action{margin-top:15px;padding:8px 16px;background:rgba(255,255,255,.1);border-radius:20px;font-size:.9rem;font-weight:600;color:#4cc9f0}
+    .suggestion-card:hover .suggestion-action{background:rgba(76,201,240,.2);color:#fff}
+    
+    /* Quiz History Summary */
+    .history-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px}
+    .history-card{background:rgba(0,0,0,.2);border-radius:10px;padding:20px;transition:all .3s ease}
+    .history-card:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+    .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+    .history-header h3{color:var(--warning);font-size:1.1rem}
+    .quiz-count{background:var(--primary);padding:4px 12px;border-radius:15px;font-size:.8rem;font-weight:600}
+    .history-details p{margin-bottom:8px;font-size:.9rem}
+    .score{color:var(--success);font-weight:600}
+    .empty-history{text-align:center;padding:40px;opacity:.7}
+    .empty-history i{font-size:2rem;margin-bottom:15px;color:var(--accent)}
+    
+    /* Recent Activity */
+    .recent-activity{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);margin-bottom:40px;border:1px solid rgba(255,255,255,.1)}
+    .activity-list{list-style:none}
+    .activity-item{padding:15px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center}
+    .activity-item:last-child{border-bottom:none}
+    .activity-item i{font-size:1.2rem;margin-right:15px;color:var(--success)}
+    .activity-date{color:rgba(255,255,255,.6);font-size:.9rem;margin-left:auto}
+    
+    /* Animations */
+    @keyframes pulse{
+      0%{opacity:1;transform:scale(1)}
+      50%{opacity:.5;transform:scale(1.1)}
+      100%{opacity:1;transform:scale(1)}
+    }
+    @keyframes spin{
+      0%{transform:rotate(0deg)}
+      100%{transform:rotate(360deg)}
+    }
+    
+    /* AI Suggestion Popup */
+    .suggestion-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:1000}
+    .suggestion-popup-content{background:var(--card-bg);backdrop-filter:blur(15px);border-radius:20px;padding:40px;max-width:500px;width:90%;text-align:center;border:2px solid var(--success);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+    .suggestion-popup-icon{font-size:4rem;color:var(--success);margin-bottom:20px}
+    .suggestion-popup-title{font-size:1.8rem;margin-bottom:15px;color:var(--success)}
+    .suggestion-popup-message{font-size:1.1rem;margin-bottom:30px;line-height:1.6;opacity:0.9}
+    .suggestion-popup-buttons{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+    .btn-start-quiz{background:var(--success);color:white;border:2px solid var(--success);padding:12px 25px;border-radius:25px;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .btn-start-quiz:hover{background:#3bb3d3;border-color:#3bb3d3;transform:translateY(-2px);box-shadow:0 5px 15px rgba(76,201,240,0.3)}
+    .btn-cancel{background:rgba(255,255,255,0.1);color:white;border:2px solid rgba(255,255,255,0.3);padding:12px 25px;border-radius:25px;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .btn-cancel:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px)}
+    .close-suggestion-popup{position:absolute;top:15px;right:20px;background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;opacity:0.7;transition:opacity 0.3s ease}
+    .close-suggestion-popup:hover{opacity:1}
+    
+    /* Responsive */
+    @media (max-width: 768px){
+      .header-content{flex-direction:column;text-align:center;gap:15px}
+      .dashboard-actions{margin-top:15px}
+      .dashboard-grid{grid-template-columns:1fr}
+      .nav-links{flex-wrap:wrap;justify-content:center}
+      .suggestion-popup-content{padding:30px 20px}
+      .suggestion-popup-buttons{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+        <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="welcome-text">
+          <h1>Welcome, {% if user.is_authenticated %}{{ user.username }}{% else %}Guest{% endif %}!</h1>
+          <p>Ready to continue your learning journey?</p>
+        </div>
+        <div class="dashboard-actions">
+          <a href="{% url 'help' %}"><i class="fas fa-question-circle"></i> Help</a>
+          <a href="{% url 'settings'%}"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="dashboard-grid">
+      <div class="stat-card card-1">
+        <i class="fas fa-check-circle"></i>
+        <h3>Quizzes Completed</h3>
+        <p class="number">{{ quizzes_completed }}</p>
+      </div>
+      <div class="stat-card card-2">
+        <i class="fas fa-star"></i>
+        <h3>XP Points</h3>
+        <p class="number">{{ user_xp.total_xp }}</p>
+        <small>Level {{ user_xp.level }}</small>
+      </div>
+      <div class="stat-card card-3">
+        <i class="fas fa-fire"></i>
+        <h3>Current Streak</h3>
+        <p class="number">{{ user_xp.current_streak }} days</p>
+      </div>
+      <div class="stat-card card-1">
+        <i class="fas fa-chart-line"></i>
+        <h3>Average Score</h3>
+        <p class="number">{{ avg_score }}%</p>
+      </div>
+    </div>
+    
+    <!-- Achievements Section -->
+    {% if recent_achievements %}
+    <div class="achievements" style="margin-bottom: 30px;">
+      <h2 class="section-title">🏆 Recent Achievements</h2>
+      <div class="action-grid">
+        {% for achievement in recent_achievements %}
+        <div class="action-card" style="background: linear-gradient(135deg, #f9c74f 0%, #f8961e 100%); color: #333;">
+          <i style="font-size: 2rem; margin-bottom: 15px;">{{ achievement.achievement.icon }}</i>
+          <h3>{{ achievement.achievement.name }}</h3>
+          <p>{{ achievement.achievement.description }}</p>
+          <small>+{{ achievement.achievement.xp_reward }} XP</small>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Leaderboard -->
+    <div class="leaderboard" style="margin-bottom: 30px;">
+      <h2 class="section-title">🏅 Leaderboard</h2>
+      <div class="stat-card" style="text-align: left;">
+        {% for player in leaderboard %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; align-items: center;">
+            <span style="margin-right: 15px; font-weight: bold; color: {% if forloop.counter <= 3 %}#ffd43b{% else %}#ccc{% endif %};">{{ forloop.counter }}</span>
+            <span>{{ player.user.username }}</span>
+          </div>
+          <div>
+            <span style="color: #4cc9f0;">{{ player.total_xp }} XP</span>
+            <small style="margin-left: 10px; opacity: 0.7;">Level {{ player.level }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+     <!-- AI Detailed Recommendations -->
+    <div class="ai-recommendations" style="margin-bottom: 40px;">
+      <div class="stat-card ai-analysis-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; text-align: left; position: relative; overflow: hidden; transition: all 0.3s ease;">
+        <h2 class="section-title" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border: none; padding: 0;">
+          <span style="display: flex; align-items: center;">
+            <i class="fas fa-robot" style="margin-right: 10px; color: #ffd43b;"></i>
+            AI Learning Analysis
+          </span>
+          <button class="expand-btn" onclick="toggleAnalysis()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 12px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s ease;">
+            <i class="fas fa-chevron-down" id="expand-icon" style="font-size: 0.7rem;"></i> <span id="btn-text">Expand</span>
+          </button>
+        </h2>
+          <div class="ai-content" id="ai-content" style="max-height: 120px; overflow: hidden; transition: max-height 0.3s ease;">
+          <div class="ai-text" style="white-space: pre-line; line-height: 1.6; font-size: 1rem;">{{ ai_recommendations }}</div>
+          <div class="fade-overlay" id="fade-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, #764ba2); pointer-events: none; transition: opacity 0.3s ease;"></div>
+        </div>
+        <div class="analysis-points" id="analysis-points" style="display: none; margin-top: 20px;">
+          <h4 style="color: #ffd43b; margin-bottom: 15px; font-size: 1.1rem;">📊 Key Insights:</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 8px; padding-left: 18px; position: relative; font-size: 1rem;">
+              <i class="fas fa-chart-line" style="position: absolute; left: 0; top: 3px; color: #4cc9f0; font-size: 1rem;"></i>
+              <strong>Performance Trend:</strong> Your scores show consistent improvement
+            </li>
+            <li style="margin-bottom: 8px; padding-left: 18px; position: relative; font-size: 1rem;">
+              <i class="fas fa-target" style="position: absolute; left: 0; top: 3px; color: #f72585; font-size: 1rem;"></i>
+              <strong>Focus Areas:</strong> Strengthen weak topics for better results
+            </li>
+            <li style="margin-bottom: 8px; padding-left: 18px; position: relative; font-size: 1rem;">
+              <i class="fas fa-lightbulb" style="position: absolute; left: 0; top: 3px; color: #ffd43b; font-size: 1rem;"></i>
+              <strong>Recommendation:</strong> Practice regularly to maintain momentum
+            </li>
+            <li style="margin-bottom: 8px; padding-left: 18px; position: relative; font-size: 1rem;">
+              <i class="fas fa-trophy" style="position: absolute; left: 0; top: 3px; color: #f9844a; font-size: 0.8rem;"></i>
+              <strong>Next Goal:</strong> Aim for 85%+ average score this week
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Suggestions -->
+    <div class="quick-actions">
+      <h2 class="section-title">🤖 Quick AI Suggestions</h2>
+      <div class="action-grid">
+        {% for suggestion in ai_suggestions %}
+        <div class="action-card suggestion-card priority-{{ suggestion.priority }}" onclick="showSuggestionPopup('{{ suggestion.topic }}', '{{ suggestion.difficulty }}', '{{ suggestion.title }}', '{{ suggestion.message }}')">
+          <i class="fas fa-robot"></i>
+          <span class="suggestion-icon">{{ suggestion.icon }}</span>
+          <h3>{{ suggestion.title }}</h3>
+          <p>{{ suggestion.message }}</p>
+          <div class="suggestion-action">{{ suggestion.action }}</div>
+        </div>
+        {% empty %}
+        <div class="action-card suggestion-card priority-medium" onclick="showSuggestionPopup('General', 'Easy', 'Keep Learning!', 'Take more quizzes to unlock personalized AI recommendations.')">
+          <i class="fas fa-robot"></i>
+          <span class="suggestion-icon">📚</span>
+          <h3>Keep Learning!</h3>
+          <p>Take more quizzes to unlock personalized AI recommendations.</p>
+          <div class="suggestion-action">Start Quiz</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="action-grid">
+        <div class="action-card" onclick="location.href='{% url 'start_quiz' %}'">
+          <i class="fas fa-play-circle"></i>
+          <h3>Start New Quiz</h3>
+          <p>AI-powered adaptive assessment</p>
+        </div>
+        <div class="action-card" onclick="location.href='{% url 'chatbot' %}'">
+          <i class="fas fa-robot"></i>
+          <h3>AI Learning Assistant</h3>
+          <p>Ask me to explain any topic</p>
+        </div>
+        <div class="action-card" onclick="location.href='{% url 'progress' %}'">
+          <i class="fas fa-analytics"></i>
+          <h3>View Progress</h3>
+          <p>Detailed analytics & insights</p>
+        </div>
+        <div class="action-card" onclick="location.href='{% url 'browse_topics' %}'">
+          <i class="fas fa-book"></i>
+          <h3>Browse Topics</h3>
+          <p>Explore learning subjects</p>
+        </div>
+        <div class="action-card" onclick="location.href='{% url 'history' %}'">
+          <i class="fas fa-history"></i>
+          <h3>Quiz History</h3>
+          <p>Review past attempts</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz History Summary -->
+    <div class="recent-activity">
+      <h2 class="section-title">Quiz History Summary</h2>
+      <div class="history-grid">
+        {% for item in quiz_history_summary %}
+        <div class="history-card">
+          <div class="history-header">
+            <h3>{{ item.topic }}</h3>
+            <span class="quiz-count">{{ item.count }} quiz{{ item.count|pluralize }}</span>
+          </div>
+          <div class="history-details">
+            <p><strong>Subtopic:</strong> {{ item.subtopic|default:"General" }}</p>
+            <p><strong>Average Score:</strong> <span class="score">{{ item.avg_score|floatformat:1 }}%</span></p>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-history">
+          <i class="fas fa-clipboard-list"></i>
+          <p>No quiz history yet. Take your first quiz to see your progress!</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+      <h2 class="section-title">Recent Activity</h2>
+      <ul class="activity-list">
+        {% for activity in recent_activity %}
+        <li class="activity-item">
+          <i class="fas fa-check"></i>
+          <span>Completed {{ activity.topic }} Quiz - Score: {{ activity.score|floatformat:0 }}%</span>
+          <span class="activity-date">{{ activity.attempt_date|timesince }} ago</span>
+        </li>
+        {% empty %}
+        <li class="activity-item">
+          <i class="fas fa-info-circle"></i>
+          <span>No quiz activity yet. Start your first quiz!</span>
+          <span class="activity-date"></span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- AI Suggestion Popup -->
+  <div class="suggestion-popup" id="suggestionPopup">
+    <div class="suggestion-popup-content">
+      <button class="close-suggestion-popup" onclick="closeSuggestionPopup()">&times;</button>
+      <div class="suggestion-popup-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <h2 class="suggestion-popup-title" id="popupTitle">Starting Quiz</h2>
+      <p class="suggestion-popup-message" id="popupMessage">You're about to start a quiz based on AI recommendation.</p>
+      <div class="suggestion-popup-buttons">
+        <button class="btn-cancel" onclick="closeSuggestionPopup()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <a href="#" class="btn-start-quiz" id="startQuizBtn">
+          <i class="fas fa-play"></i> Start Quiz
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let performanceChart;
+    
+    // Initialize performance chart
+    function initPerformanceChart() {
+      const ctx = document.getElementById('performanceChart').getContext('2d');
+      performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Average Score',
+            data: [],
+            borderColor: '#4cc9f0',
+            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#4cc9f0',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }, {
+            label: 'Quiz Count',
+            data: [],
+            borderColor: '#f9c74f',
+            backgroundColor: 'rgba(249, 199, 79, 0.1)',
+            tension: 0.4,
+            fill: false,
+            pointBackgroundColor: '#f9c74f',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: 'white' }
+            }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              max: 100,
+              ticks: { color: 'white' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              ticks: { color: 'white' },
+              grid: { drawOnChartArea: false }
+            },
+            x: {
+              ticks: { color: 'white' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
+            }
+          },
+          animation: {
+            duration: 1000,
+            easing: 'easeInOutQuart'
+          }
+        }
+      });
+    }
+    
+    // Update performance data
+    function updatePerformanceData() {
+      document.getElementById('performanceLoading').style.display = 'block';
+      
+      fetch('/api/user-performance/')
+        .then(response => response.json())
+        .then(data => {
+          // Update stats
+          document.getElementById('userAvgScore').textContent = Math.round(data.user_stats.avg_score) + '%';
+          document.getElementById('userBestScore').textContent = Math.round(data.user_stats.best_score) + '%';
+          document.getElementById('userTotalQuizzes').textContent = data.user_stats.total_quizzes;
+          document.getElementById('userStreak').textContent = data.user_stats.current_streak;
+          
+          // Update chart
+          const labels = data.daily_performance.map(item => item.label);
+          const scores = data.daily_performance.map(item => item.avg_score);
+          const counts = data.daily_performance.map(item => item.quiz_count);
+          
+          performanceChart.data.labels = labels;
+          performanceChart.data.datasets[0].data = scores;
+          performanceChart.data.datasets[1].data = counts;
+          performanceChart.update();
+          
+          // Update topic performance
+          updateTopicPerformance(data.topic_performance);
+          
+          document.getElementById('performanceLoading').style.display = 'none';
+        })
+        .catch(error => {
+          console.error('Error fetching performance data:', error);
+          document.getElementById('performanceLoading').style.display = 'none';
+        });
+    }
+    
+    // Update topic performance display
+    function updateTopicPerformance(topics) {
+      const container = document.getElementById('topicPerformance');
+      container.innerHTML = '';
+      
+      topics.forEach(topic => {
+        const topicCard = document.createElement('div');
+        topicCard.style.cssText = 'background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; text-align: center;';
+        
+        const scoreColor = topic.avg_score >= 80 ? '#4cc9f0' : topic.avg_score >= 60 ? '#f9c74f' : '#f72585';
+        
+        topicCard.innerHTML = `
+          <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">${topic.topic}</div>
+          <div style="font-size: 1.2rem; font-weight: bold; color: ${scoreColor};">${Math.round(topic.avg_score)}%</div>
+          <div style="font-size: 0.8rem; opacity: 0.8;">${topic.count} quiz${topic.count !== 1 ? 'es' : ''}</div>
+        `;
+        
+        container.appendChild(topicCard);
+      });
+      
+      if (topics.length === 0) {
+        container.innerHTML = '<div style="text-align: center; opacity: 0.7; padding: 20px;">No quiz data available yet. Take your first quiz!</div>';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('User dashboard loaded');
+      
+      // Initialize performance chart
+      initPerformanceChart();
+      updatePerformanceData();
+      
+      // Update performance data every 2 minutes
+      setInterval(updatePerformanceData, 120000);
+    });
+
+    let isExpanded = false;
+    
+    function toggleAnalysis() {
+      const content = document.getElementById('ai-content');
+      const points = document.getElementById('analysis-points');
+      const overlay = document.getElementById('fade-overlay');
+      const icon = document.getElementById('expand-icon');
+      const btnText = document.getElementById('btn-text');
+      const card = document.querySelector('.ai-analysis-card');
+      
+      if (!isExpanded) {
+        // Get actual content height for smooth animation
+        content.style.maxHeight = 'none';
+        const actualHeight = content.scrollHeight;
+        content.style.maxHeight = '120px';
+        
+        // Expand with smooth animation
+        setTimeout(() => {
+          content.style.maxHeight = actualHeight + 'px';
+          overlay.style.opacity = '0';
+        }, 10);
+        
+        setTimeout(() => {
+          content.style.overflow = 'visible';
+          points.style.display = 'block';
+          overlay.style.display = 'none';
+          points.style.opacity = '1';
+          points.style.transform = 'translateY(0)';
+        }, 300);
+        
+        icon.className = 'fas fa-chevron-up';
+        icon.style.fontSize = '0.7rem';
+        btnText.textContent = 'Collapse';
+        card.style.transform = 'scale(1.01)';
+        
+        isExpanded = true;
+      } else {
+        // Collapse with smooth animation
+        content.style.overflow = 'hidden';
+        points.style.display = 'none';
+        overlay.style.display = 'block';
+        overlay.style.opacity = '1';
+        content.style.maxHeight = '120px';
+        
+        icon.className = 'fas fa-chevron-down';
+        icon.style.fontSize = '0.7rem';
+        btnText.textContent = 'Expand';
+        card.style.transform = 'scale(1)';
+        
+        isExpanded = false;
+      }
+    }
+
+    // AI Suggestion popup functions
+    function showSuggestionPopup(topic, difficulty, title, message) {
+      const popup = document.getElementById('suggestionPopup');
+      const popupTitle = document.getElementById('popupTitle');
+      const popupMessage = document.getElementById('popupMessage');
+      const startBtn = document.getElementById('startQuizBtn');
+      
+      popupTitle.textContent = `Starting: ${title}`;
+      popupMessage.innerHTML = `${message}<br><br><strong>Topic:</strong> ${topic}<br><strong>Difficulty:</strong> ${difficulty}<br><br>🎯 This is your next goal! Ready to level up?`;
+      startBtn.href = `/start_quiz/?topic=${encodeURIComponent(topic)}&difficulty=${encodeURIComponent(difficulty)}`;
+      
+      popup.style.display = 'flex';
+    }
+    
+    function closeSuggestionPopup() {
+      const popup = document.getElementById('suggestionPopup');
+      popup.style.display = 'none';
+    }
+    
+    // Add hover effects
+    document.addEventListener('DOMContentLoaded', function() {
+      const expandBtn = document.querySelector('.expand-btn');
+      if (expandBtn) {
+        expandBtn.addEventListener('mouseenter', function() {
+          this.style.background = 'rgba(255,255,255,0.3)';
+          this.style.transform = 'translateY(-2px)';
+        });
+        expandBtn.addEventListener('mouseleave', function() {
+          this.style.background = 'rgba(255,255,255,0.2)';
+          this.style.transform = 'translateY(0)';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

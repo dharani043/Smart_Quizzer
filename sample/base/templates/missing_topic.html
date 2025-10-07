@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic Not Available - SmartQuizzer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{background:var(--gradient);color:var(--light);min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .container{width:100%;max-width:600px;margin:0 auto;padding:20px}
+    
+    .message-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:20px;padding:40px;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    .message-icon{font-size:4rem;color:var(--warning);margin-bottom:20px}
+    .message-title{font-size:1.8rem;margin-bottom:15px;color:#fff}
+    .message-text{font-size:1.1rem;opacity:.9;margin-bottom:25px;line-height:1.6}
+    
+    .path-info{background:rgba(255,255,255,.1);border-radius:15px;padding:20px;margin-bottom:25px}
+    .path-info h3{color:var(--success);margin-bottom:10px}
+    .path-progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+    .missing-topic{color:var(--accent);font-weight:600}
+    
+    .btn{padding:12px 25px;border:none;border-radius:25px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s ease;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin:5px}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(67,97,238,.4)}
+    .btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:2px solid rgba(255,255,255,.2)}
+    .btn-secondary:hover{background:rgba(255,255,255,.2)}
+    
+    .actions{margin-top:20px}
+    
+    @media (max-width: 768px){
+      .btn{width:100%;justify-content:center;margin:5px 0}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="message-card">
+      <div class="message-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      
+      <h1 class="message-title">Topic Not Available</h1>
+      <p class="message-text">
+        The next topic in your learning path is not yet available in our database. 
+        Don't worry - you can request it and our admin will add it quickly!
+      </p>
+      
+      <div class="path-info">
+        <h3><i class="fas fa-route"></i> {{ path_name }}</h3>
+        <div class="path-progress">
+          <span>Module {{ module_number }} of {{ total_modules }}</span>
+          <span>{{ current_module.name }}</span>
+        </div>
+        <p><strong>Missing Topic:</strong> <span class="missing-topic">{{ missing_topic }}</span></p>
+        <p><strong>Module:</strong> {{ current_module.name }}</p>
+      </div>
+      
+      <div class="actions">
+        <a href="{% url 'request_topic' %}?topic={{ missing_topic }}&path={{ path_name }}" class="btn btn-primary">
+          <i class="fas fa-plus-circle"></i> Request This Topic
+        </a>
+        <a href="{% url 'browse_topics' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Topics
+        </a>
+      </div>
+      
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.2); opacity: 0.8;">
+        <p><i class="fas fa-info-circle"></i> Once the topic is added, you can continue your learning path from where you left off.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - SmartQuizzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        /* Help Sections */
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .help-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .help-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--warning);
+        }
+        
+        .step-list {
+            list-style: none;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .step-number {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .feature-item i {
+            color: var(--success);
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .faq-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--warning);
+            text-align: center;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .faq-question i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .faq-answer {
+            opacity: 0.8;
+            line-height: 1.5;
+            margin-left: 25px;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .contact-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .contact-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .contact-info i {
+            color: var(--accent);
+            margin-right: 12px;
+            width: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .help-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+            <div class="nav-links">
+                <a href="{% url 'userdashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'start_quiz' %}"><i class="fas fa-play"></i> Take Quiz</a>
+                <a href="{% url 'progress' %}"><i class="fas fa-chart-line"></i> Progress</a>
+                <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-question-circle"></i> Help & Support</h1>
+            <p>Everything you need to know about using SmartQuizzer effectively</p>
+        </div>
+
+        <!-- Help Cards -->
+        <div class="help-grid">
+            <!-- Getting Started -->
+            <div class="help-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="card-title">Getting Started</h3>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div>Create your account and complete your profile</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div>Choose a topic from our extensive question bank</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div>Select difficulty level and number of questions</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div>Take the quiz with our 2-minute timer per question</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">5</div>
+                        <div>Review results and track your progress</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Key Features -->
+            <div class="help-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="card-title">Key Features</h3>
+                </div>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>AI-powered adaptive quiz generation</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Timed quizzes with 2-minute per question</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Detailed progress tracking and analytics</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-keyboard"></i>
+                        <span>Keyboard shortcuts (A/B/C/D keys)</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Hint system for challenging questions</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Achievement system and streak tracking</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Fully responsive mobile-friendly design</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quiz Tips -->
+            <div class="help-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="card-title">Quiz Taking Tips</h3>
+                </div>
+                <ul class="step-list">
+                    <li class="step-item">
+                        <div class="step-number">💡</div>
+                        <div>Use keyboard shortcuts (A, B, C, D) for faster selection</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">⏰</div>
+                        <div>Watch the timer - you have 2 minutes per question</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">🎯</div>
+                        <div>Rate your confidence level for better analytics</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">💭</div>
+                        <div>Use hints when you're stuck on difficult questions</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">📊</div>
+                        <div>Review your progress regularly to identify weak areas</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question"></i>
+                    How long do I have to answer each question?
+                </div>
+                <div class="faq-answer">
+                    You have 2 minutes per question. The timer is displayed in the top-right corner and will turn red when you have 30 seconds left.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question"></i>
+                    Can I pause a quiz once I've started?
+                </div>
+                <div class="faq-answer">
+                    No, quizzes cannot be paused once started. However, if time runs out, the system will automatically submit your current selection.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question"></i>
+                    How is my score calculated?
+                </div>
+                <div class="faq-answer">
+                    Your score is calculated as a percentage: (Correct Answers / Total Questions) × 100. Detailed analytics are available in your progress section.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question"></i>
+                    What are the keyboard shortcuts?
+                </div>
+                <div class="faq-answer">
+                    Use A, B, C, D keys to select answers quickly, and press Enter to submit. Numbers 1, 2, 3, 4 also work for option selection.
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question"></i>
+                    How do I track my progress?
+                </div>
+                <div class="faq-answer">
+                    Visit the Progress page to see detailed analytics, including topic-wise performance, score trends, and achievement tracking.
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <div class="contact-card">
+                <h3 class="card-title">Contact Support</h3>
+                <div class="contact-info">
+                    <i class="fas fa-envelope"></i>
+                    <span>support@smartquizzer.com</span>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-phone"></i>
+                    <span>+1 (555) 123-4567</span>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Support Available</span>
+                </div>
+            </div>
+            
+            <div class="contact-card">
+                <h3 class="card-title">Quick Links</h3>
+                <div class="contact-info">
+                    <i class="fas fa-book"></i>
+                    <a href="#" style="color: var(--light); text-decoration: none;">User Guide</a>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-video"></i>
+                    <a href="#" style="color: var(--light); text-decoration: none;">Video Tutorials</a>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-comments"></i>
+                    <a href="#" style="color: var(--light); text-decoration: none;">Community Forum</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

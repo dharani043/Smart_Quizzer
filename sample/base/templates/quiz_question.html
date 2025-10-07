@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if quiz_complete %}Quiz Results{% else %}Question {{ question_number }}{% endif %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .quiz-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--success);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .options-container {
+            margin-bottom: 25px;
+        }
+        
+        .option {
+            display: block;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .option {
+            transition: all 0.3s ease;
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #ff4da6;
+            transform: translateY(-2px);
+        }
+        
+        /* Timer Styles */
+        .quiz-timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .timer-icon {
+            font-size: 1.2rem;
+            color: var(--warning);
+        }
+        
+        .timer-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .timer-warning {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Question Navigation */
+        .question-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Question Difficulty Badge */
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .difficulty-badge.easy {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .difficulty-badge.medium {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .difficulty-badge.hard {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Confidence Selector */
+        .confidence-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .confidence-title {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        .confidence-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .confidence-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 20px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .confidence-btn.selected {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Hint System */
+        .hint-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .hint-section.show {
+            display: block;
+        }
+        
+        .hint-btn {
+            background: var(--warning);
+            color: var(--dark);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .hint-content {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        /* Results Styling */
+        .results-container {
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid var(--success);
+        }
+        
+        .score-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .results-message {
+            margin-bottom: 20px;
+        }
+        
+        .results-details {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .wrong-answers-section {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .wrong-answer-item {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        {% if quiz_complete %}
+        <!-- Results Section -->
+        <div class="results-container">
+            <div class="quiz-header">
+                <h1>Quiz Completed!</h1>
+                <p>Congratulations on finishing the quiz</p>
+            </div>
+            
+            <div class="score-circle">
+                <span class="score-text">{{ percentage|floatformat:0 }}%</span>
+            </div>
+            
+            <div class="results-message">
+                {% if percentage >= 80 %}
+                <h2><i class="fas fa-trophy"></i> Excellent Work!</h2>
+                <p>You've mastered this topic!</p>
+                {% elif percentage >= 60 %}
+                <h2><i class="fas fa-star"></i> Good Job!</h2>
+                <p>Solid understanding of the material!</p>
+                {% else %}
+                <h2><i class="fas fa-redo"></i> Keep Practicing</h2>
+                <p>Review the material and try again!</p>
+                {% endif %}
+            </div>
+            
+            <div class="results-details">
+                <p><strong>Topic:</strong> {{ topic }}</p>
+                {% if subtopic and subtopic != 'All Subtopics' %}<p><strong>Subtopic:</strong> {{ subtopic }}</p>{% endif %}
+                <p><strong>Score:</strong> {{ score }} out of {{ total }}</p>
+            </div>
+            
+            {% if wrong_answers %}
+            <div class="wrong-answers-section" style="margin: 25px 0; text-align: left;">
+                <h3 style="color: var(--danger); margin-bottom: 15px; text-align: center;"><i class="fas fa-times-circle"></i> Review Wrong Answers</h3>
+                {% for wrong in wrong_answers %}
+                <div class="wrong-answer-item" style="background: rgba(230, 57, 70, 0.1); border-left: 4px solid var(--danger); padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                    <div class="question-text" style="font-weight: 600; margin-bottom: 10px; color: white;">{{ wrong.question }}</div>
+                    <div class="answer-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem;">
+                        <div class="user-answer" style="background: rgba(230, 57, 70, 0.2); padding: 10px; border-radius: 6px;">
+                            <div style="font-weight: 600; color: var(--danger); margin-bottom: 5px;">❌ Your Answer:</div>
+                            <div>{{ wrong.user_answer }}. 
+                                {% if wrong.user_answer == 'A' %}{{ wrong.options.A }}
+                                {% elif wrong.user_answer == 'B' %}{{ wrong.options.B }}
+                                {% elif wrong.user_answer == 'C' %}{{ wrong.options.C }}
+                                {% elif wrong.user_answer == 'D' %}{{ wrong.options.D }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="correct-answer" style="background: rgba(76, 201, 240, 0.2); padding: 10px; border-radius: 6px;">
+                            <div style="font-weight: 600; color: var(--success); margin-bottom: 5px;">✅ Correct Answer:</div>
+                            <div>{{ wrong.correct_answer }}. 
+                                {% if wrong.correct_answer == 'A' %}{{ wrong.options.A }}
+                                {% elif wrong.correct_answer == 'B' %}{{ wrong.options.B }}
+                                {% elif wrong.correct_answer == 'C' %}{{ wrong.options.C }}
+                                {% elif wrong.correct_answer == 'D' %}{{ wrong.options.D }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if new_achievements %}
+            <div class="achievements-section" style="margin: 25px 0; padding: 20px; background: rgba(76, 201, 240, 0.1); border-radius: 10px; border: 1px solid var(--success);">
+                <h3 style="color: var(--success); margin-bottom: 15px; text-align: center;"><i class="fas fa-trophy"></i> New Achievements Unlocked!</h3>
+                {% for achievement in new_achievements %}
+                <div style="text-align: center; margin: 10px 0;">
+                    <span style="font-size: 2rem;">{{ achievement.icon }}</span>
+                    <div style="font-weight: 600; color: var(--success);">{{ achievement.name }}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">{{ achievement.description }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="action-buttons">
+                <a href="{% url 'start_quiz' %}" class="btn"><i class="fas fa-redo"></i> Try Another Quiz</a>
+                <a href="{% url 'userdashboard' %}" class="btn btn-secondary"><i class="fas fa-tachometer-alt"></i> Back to Dashboard</a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Question Section -->
+        <div class="quiz-header">
+            <h1>Question {{ question_number }} of {{ total_questions }}
+                <span class="difficulty-badge {{ question.difficulty|lower }}">{{ question.difficulty }}</span>
+            </h1>
+            <p>Topic: {{ question.topic }}{% if question.subtopic %} • {{ question.subtopic }}{% endif %}</p>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" style="width: {% widthratio question_number total_questions 100 %}%"></div>
+        </div>
+        
+        <div class="question-text">
+            {{ question.question_text }}
+        </div>
+        
+        <!-- Quiz Timer -->
+        <div class="quiz-timer" id="quiz-timer">
+            <i class="fas fa-clock timer-icon"></i>
+            <span class="timer-text" id="timer-display">02:00</span>
+        </div>
+        
+        <form method="POST" action="{% url 'process_answer' %}" id="quiz-form">
+            {% csrf_token %}
+            <div class="options-container">
+                <label class="option">
+                    <input type="radio" name="answer" value="A" required>
+                    <span>A. {{ question.optionA }}</span>
+                </label>
+                
+                <label class="option">
+                    <input type="radio" name="answer" value="B">
+                    <span>B. {{ question.optionB }}</span>
+                </label>
+                
+                <label class="option">
+                    <input type="radio" name="answer" value="C">
+                    <span>C. {{ question.optionC }}</span>
+                </label>
+                
+                <label class="option">
+                    <input type="radio" name="answer" value="D">
+                    <span>D. {{ question.optionD }}</span>
+                </label>
+            </div>
+            
+            <!-- Confidence Selector -->
+            <div class="confidence-selector">
+                <div class="confidence-title">How confident are you in your answer?</div>
+                <div class="confidence-options">
+                    <button type="button" class="confidence-btn" data-confidence="1">Not Sure</button>
+                    <button type="button" class="confidence-btn" data-confidence="2">Somewhat</button>
+                    <button type="button" class="confidence-btn" data-confidence="3">Confident</button>
+                    <button type="button" class="confidence-btn" data-confidence="4">Very Sure</button>
+                </div>
+                <input type="hidden" name="confidence" id="confidence-input" value="3">
+            </div>
+            
+            <!-- Hint Section -->
+            <div class="hint-section" id="hint-section">
+                <button type="button" class="hint-btn" onclick="showHint()">💡 Show Hint</button>
+                <div class="hint-content" id="hint-content" style="display: none;">
+                    This is a sample hint that would help guide the user to the correct answer without giving it away directly.
+                </div>
+            </div>
+            
+            <div class="question-nav">
+                <button type="button" class="nav-btn" onclick="showHintSection()">💡 Need Help?</button>
+                <button type="submit" class="btn"><i class="fas fa-arrow-right"></i> Submit Answer</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+
+    <script>
+        // Quiz Timer
+        let timeLeft = 120; // 2 minutes per question
+        let timerInterval;
+        
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 30) {
+                    document.getElementById('quiz-timer').classList.add('timer-warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    autoSubmitForm();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').textContent = display;
+        }
+        
+        function autoSubmitForm() {
+            // Auto-select first option if none selected
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (!selectedOption) {
+                document.querySelector('input[name="answer"]').checked = true;
+            }
+            document.getElementById('quiz-form').submit();
+        }
+        
+        // Confidence Selector
+        document.addEventListener('DOMContentLoaded', function() {
+            const confidenceBtns = document.querySelectorAll('.confidence-btn');
+            const confidenceInput = document.getElementById('confidence-input');
+            
+            // Set default confidence
+            document.querySelector('.confidence-btn[data-confidence="3"]').classList.add('selected');
+            
+            confidenceBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    confidenceBtns.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    confidenceInput.value = this.dataset.confidence;
+                });
+            });
+            
+            // Add animation to progress bar
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                setTimeout(() => {
+                    progressBar.style.transition = 'width 0.5s ease';
+                }, 100);
+            }
+            
+            // Start timer if not in results mode
+            if ("{{ quiz_complete|yesno:'true,false' }}" === "false") {
+                startTimer();
+                
+                // Prevent form resubmission
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.href);
+                }
+            }
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if ("{{ quiz_complete|yesno:'true,false' }}" === "false") {
+                    switch(e.key) {
+                        case '1':
+                        case 'a':
+                        case 'A':
+                            document.querySelector('input[value="A"]').checked = true;
+                            break;
+                        case '2':
+                        case 'b':
+                        case 'B':
+                            document.querySelector('input[value="B"]').checked = true;
+                            break;
+                        case '3':
+                        case 'c':
+                        case 'C':
+                            document.querySelector('input[value="C"]').checked = true;
+                            break;
+                        case '4':
+                        case 'd':
+                        case 'D':
+                            document.querySelector('input[value="D"]').checked = true;
+                            break;
+                        case 'Enter':
+                            e.preventDefault();
+                            document.getElementById('quiz-form').submit();
+                            break;
+                    }
+                }
+            });
+        });
+        
+        // Hint System
+        function showHintSection() {
+            const hintSection = document.getElementById('hint-section');
+            hintSection.classList.add('show');
+        }
+        
+        function showHint() {
+            const hintContent = document.getElementById('hint-content');
+            hintContent.style.display = 'block';
+        }
+        
+        // Form submission with analytics
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            clearInterval(timerInterval);
+            
+            // Add time taken to form (in seconds, then convert to minutes in backend)
+            const timeTaken = 120 - timeLeft;
+            const timeInput = document.createElement('input');
+            timeInput.type = 'hidden';
+            timeInput.name = 'time_taken';
+            timeInput.value = timeTaken;
+            this.appendChild(timeInput);
+        });
+        
+        // Option hover effects
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            option.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body>
+</html>

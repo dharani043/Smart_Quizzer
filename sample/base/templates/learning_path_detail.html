@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ path.name }} - SmartQuizzer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{background:var(--gradient);color:var(--light);min-height:100vh}
+    .container{width:100%;max-width:1200px;margin:0 auto;padding:0 20px}
+    
+    /* Navigation */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    /* Header */
+    .path-header{background:linear-gradient(135deg,rgba(67,97,238,.3),rgba(118,75,162,.3));border-radius:20px;padding:40px;margin-bottom:40px;text-align:center;border:2px solid rgba(76,201,240,.3)}
+    .path-title{font-size:2.5rem;margin-bottom:15px;background:linear-gradient(to right,#fff,#4cc9f0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .path-subtitle{font-size:1.2rem;opacity:.9;margin-bottom:20px}
+    .path-meta{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:25px}
+    .meta-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);padding:8px 16px;border-radius:20px}
+    .meta-item i{color:var(--warning)}
+    
+    /* Progress */
+    .progress-section{background:var(--card-bg);border-radius:15px;padding:25px;margin-bottom:30px;backdrop-filter:blur(10px)}
+    .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+    .progress-bar{background:rgba(255,255,255,.2);height:12px;border-radius:6px;overflow:hidden}
+    .progress-fill{background:linear-gradient(90deg,var(--success),var(--warning));height:100%;border-radius:6px;transition:width .3s ease}
+    
+    /* Modules */
+    .modules-section{margin-bottom:40px}
+    .section-title{font-size:1.8rem;margin-bottom:25px;color:var(--warning);display:flex;align-items:center}
+    .section-title i{margin-right:10px}
+    .modules-grid{display:grid;gap:20px}
+    .module-card{background:var(--card-bg);border-radius:15px;padding:25px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);transition:all .3s ease}
+    .module-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    .module-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}
+    .module-name{font-size:1.3rem;font-weight:600;color:#fff}
+    .module-duration{background:var(--primary);color:#fff;padding:4px 12px;border-radius:15px;font-size:.8rem}
+    .module-topics{margin-bottom:15px}
+    .module-topics h4{color:var(--warning);margin-bottom:8px;font-size:.9rem}
+    .topic-tags{display:flex;flex-wrap:wrap;gap:6px}
+    .topic-tag{background:rgba(255,255,255,.1);padding:4px 10px;border-radius:12px;font-size:.75rem}
+    .module-stats{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;opacity:.8}
+    
+    /* Features & Info */
+    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;margin-bottom:40px}
+    .info-card{background:var(--card-bg);border-radius:15px;padding:25px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1)}
+    .info-card h3{color:var(--warning);margin-bottom:15px;display:flex;align-items:center}
+    .info-card h3 i{margin-right:10px}
+    .info-list{list-style:none}
+    .info-list li{margin-bottom:8px;padding-left:20px;position:relative}
+    .info-list li::before{content:'✓';position:absolute;left:0;color:var(--success);font-weight:bold}
+    
+    /* Actions */
+    .actions-section{text-align:center;margin-bottom:40px}
+    .btn{padding:12px 30px;border:none;border-radius:25px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s ease;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin:0 10px}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(67,97,238,.4)}
+    .btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:2px solid rgba(255,255,255,.2)}
+    .btn-secondary:hover{background:rgba(255,255,255,.2)}
+    
+    /* Responsive */
+    @media (max-width: 768px){
+      .path-meta{flex-direction:column;gap:15px}
+      .info-grid{grid-template-columns:1fr}
+      .btn{margin:5px;width:100%;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'browse_topics' %}"><i class="fas fa-arrow-left"></i> Back to Topics</a>
+        <a href="{% url 'userdashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <!-- Path Header -->
+    <div class="path-header">
+      <h1 class="path-title">{{ path.name }}</h1>
+      <p class="path-subtitle">{{ path.description }}</p>
+      <div class="path-meta">
+        <div class="meta-item">
+          <i class="fas fa-clock"></i>
+          <span>{{ path.duration }}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-signal"></i>
+          <span>{{ path.level }}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-book"></i>
+          <span>{{ path.modules|length }} Modules</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-question-circle"></i>
+          <span>{{ total_quizzes }} Quizzes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <h3><i class="fas fa-chart-line"></i> Your Progress</h3>
+        <span>{{ completed_quizzes }}/{{ total_quizzes }} Quizzes Completed</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+      </div>
+      <p style="margin-top: 10px; text-align: center; opacity: 0.8;">{{ progress_percentage|floatformat:1 }}% Complete</p>
+    </div>
+
+    <!-- Learning Modules -->
+    <div class="modules-section">
+      <h2 class="section-title"><i class="fas fa-graduation-cap"></i>Learning Modules</h2>
+      <div class="modules-grid">
+        {% for module in path.modules %}
+        <div class="module-card">
+          <div class="module-header">
+            <h3 class="module-name">{{ forloop.counter }}. {{ module.name }}</h3>
+            <span class="module-duration">{{ module.duration }}</span>
+          </div>
+          <div class="module-topics">
+            <h4>Topics Covered:</h4>
+            <div class="topic-tags">
+              {% for topic in module.topics %}
+              <span class="topic-tag">{{ topic }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="module-stats">
+            <span><i class="fas fa-question-circle"></i> {{ module.quizzes }} Quizzes</span>
+            <span><i class="fas fa-users"></i> Interactive Learning</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Features & Information -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3><i class="fas fa-star"></i>Key Features</h3>
+        <ul class="info-list">
+          {% for feature in path.features %}
+          <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+      <div class="info-card">
+        <h3><i class="fas fa-target"></i>Learning Outcomes</h3>
+        <ul class="info-list">
+          {% for outcome in path.outcomes %}
+          <li>{{ outcome }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+      <div class="info-card">
+        <h3><i class="fas fa-info-circle"></i>Prerequisites</h3>
+        <p style="padding-left: 20px; position: relative;">
+          <i class="fas fa-check" style="position: absolute; left: 0; top: 3px; color: var(--success);"></i>
+          {{ path.prerequisites }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-section">
+      <a href="{% url 'start_learning_path' path.name %}" class="btn btn-primary">
+        <i class="fas fa-play"></i> Start Learning Path
+      </a>
+      <a href="{% url 'browse_topics' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Explore Other Paths
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Animate progress bar on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const progressFill = document.querySelector('.progress-fill');
+      const targetWidth = progressFill.style.width;
+      progressFill.style.width = '0%';
+      
+      setTimeout(() => {
+        progressFill.style.width = targetWidth;
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- <link rel="icon" type="image/x-icon" href="fas fa-brain"> -->
+  <title>SmartQuizzer - Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0
+    }
+    body{
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:var(--light);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden
+    }
+    .container{width:100%;max-width:1200px;margin:0 auto;padding:0 20px}
+    /* Navigation */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:20px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    .btn{padding:10px 24px;border-radius:50px;border:none;cursor:pointer;font-weight:600;transition:all .3s ease;text-decoration:none;display:inline-block}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--secondary);transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.2)}
+  
+    #home{padding:60px 0;text-align:center}
+    .hero{max-width:800px;margin:0 auto}
+    .hero h1{font-size:3.5rem;margin-bottom:20px;background:linear-gradient(to right,#fff,#f72585);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p{font-size:1.2rem;line-height:1.6;margin-bottom:40px;opacity:.9}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-top:60px}
+    .feature-card{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:20px;padding:30px;text-align:center;transition:transform .3s ease}
+    .feature-card:hover{transform:translateY(-10px)}
+    .feature-card i{font-size:40px;color:var(--accent);margin-bottom:20px}
+    .feature-card h3{font-size:1.5rem;margin-bottom:15px}
+   
+    footer{margin-top:auto;text-align:center;padding:30px 0;opacity:.8}
+   
+    .messages {margin-bottom: 20px;}
+    .alert {padding: 10px;border-radius: 5px;margin-bottom: 10px;}
+    .alert-success {background-color: rgba(76, 201, 240, 0.2);border: 1px solid var(--success);}
+    .alert-error {background-color: rgba(247, 37, 133, 0.2);border: 1px solid var(--accent);}
+    
+    @media (max-width:768px){
+      .hero h1{font-size:2.5rem}
+      .features{grid-template-columns:1fr}
+      .nav-links{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        {% if not user.is_authenticated %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        <a href="/adminlogin">Admin Login</a>
+        {% endif %}
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <a href="/admindashboard">Admin Dashboard</a>
+          {% else %}
+            <a href="/userdashboard">User Dashboard</a>
+          {% endif %}
+          <a href="/logout">Logout</a>
+        {% endif %}
+      </div>
+    </nav>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="container messages">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <section id="home">
+    <div class="container">
+      <div class="hero">
+        <h1>SmartQuizzer Adaptive AI Quiz Generator</h1>
+        <p>Experience the future of learning with our AI-powered quiz platform that adapts to your knowledge level, identifies your strengths and weaknesses, and creates personalized learning paths just for you.</p>
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <a class="btn btn-primary" href="/admindashboard">Admin Dashboard</a>
+          {% else %}
+            <a class="btn btn-primary" href="/userdashboard">User Dashboard</a>
+          {% endif %}
+        {% else %}
+          <a class="btn btn-primary" href="/register">Get Started</a>
+        {% endif %}
+      </div>
+
+      <div class="features">
+        <div class="feature-card">
+          <i class="fas fa-robot"></i>
+          <h3>AI-Powered</h3>
+          <p>Advanced algorithms analyze your performance and create tailored quizzes to maximize learning efficiency.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-chart-line"></i>
+          <h3>Adaptive Learning</h3>
+          <p>Difficulty auto-adjusts based on previous answers for the right level of challenge.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-trophy"></i>
+          <h3>Track Progress</h3>
+          <p>View detailed analytics and performance reports across subjects.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    
+  </footer>
+</body>
+</html>

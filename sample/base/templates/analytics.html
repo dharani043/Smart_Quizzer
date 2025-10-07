@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartQuizzer - Analytics</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#4361ee 0%,#7209b7 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{
+      background:var(--gradient);
+      color:var(--light);min-height:100vh;
+    }
+    .container{width:100%;max-width:1600px;margin:0 auto;padding:0 20px}
+    
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    .chart-container{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:40px}
+    .chart-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.1)}
+    .chart-card h3{font-size:1.2rem;margin-bottom:20px;color:rgba(255,255,255,.9)}
+    .chart-placeholder{height:250px;background:rgba(0,0,0,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-style:italic}
+    .period-btn.active{background:#4cc9f0 !important}
+    .period-btn:hover{background:rgba(255,255,255,0.3) !important}
+    
+    @media (max-width: 1024px){
+      .chart-container{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'admindashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+
+    <div class="page-header" style="margin-bottom:30px;text-align:center">
+      <h1 style="font-size:2.5rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#f72585);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">📊 Advanced Analytics</h1>
+      <p style="color:rgba(255,255,255,.8);font-size:1.1rem">Comprehensive platform insights and statistics</p>
+    </div>
+    
+    <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:25px;margin-bottom:40px">
+      <div class="stat-card" style="background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;text-align:center;border:1px solid rgba(255,255,255,.1)">
+        <i class="fas fa-users" style="font-size:2.5rem;color:#4cc9f0;margin-bottom:15px"></i>
+        <h3 style="color:rgba(255,255,255,.9);margin-bottom:10px">Total Users</h3>
+        <p style="font-size:2rem;font-weight:700;color:#4cc9f0">{{ total_users }}</p>
+      </div>
+      <div class="stat-card" style="background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;text-align:center;border:1px solid rgba(255,255,255,.1)">
+        <i class="fas fa-question-circle" style="font-size:2.5rem;color:#f72585;margin-bottom:15px"></i>
+        <h3 style="color:rgba(255,255,255,.9);margin-bottom:10px">Total Questions</h3>
+        <p style="font-size:2rem;font-weight:700;color:#f72585">{{ total_questions }}</p>
+      </div>
+      <div class="stat-card" style="background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;text-align:center;border:1px solid rgba(255,255,255,.1)">
+        <i class="fas fa-clipboard-check" style="font-size:2.5rem;color:#f9c74f;margin-bottom:15px"></i>
+        <h3 style="color:rgba(255,255,255,.9);margin-bottom:10px">Total Quizzes</h3>
+        <p style="font-size:2rem;font-weight:700;color:#f9c74f">{{ total_quizzes }}</p>
+      </div>
+      <div class="stat-card" style="background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;text-align:center;border:1px solid rgba(255,255,255,.1)">
+        <i class="fas fa-chart-line" style="font-size:2.5rem;color:#4361ee;margin-bottom:15px"></i>
+        <h3 style="color:rgba(255,255,255,.9);margin-bottom:10px">Platform Average</h3>
+        <p style="font-size:2rem;font-weight:700;color:#4361ee">{{ avg_platform_score|floatformat:1 }}%</p>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3>User Growth Analysis</h3>
+          <div class="period-buttons" style="display: flex; gap: 5px;">
+            <button class="period-btn active" onclick="updateGrowthChart('week')" style="padding: 5px 12px; background: #4cc9f0; color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Week</button>
+            <button class="period-btn" onclick="updateGrowthChart('month')" style="padding: 5px 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Month</button>
+            <button class="period-btn" onclick="updateGrowthChart('year')" style="padding: 5px 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Year</button>
+          </div>
+        </div>
+        <canvas id="userGrowthChart" width="400" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Quiz Performance by Topic</h3>
+        <canvas id="quizPerformanceChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-card">
+        <h3>Performance Distribution</h3>
+        <canvas id="performanceChart" width="400" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Questions by Topic</h3>
+        <canvas id="questionsChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // User Growth Data
+    const growthData = {
+        week: {
+            labels: [{% for item in week_data %}'{{ item.label }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            data: [{% for item in week_data %}{{ item.count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        },
+        month: {
+            labels: [{% for item in month_data %}'{{ item.label }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            data: [{% for item in month_data %}{{ item.count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        },
+        year: {
+            labels: [{% for item in year_data %}'{{ item.label }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            data: [{% for item in year_data %}{{ item.count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        }
+    };
+    
+    // User Growth Chart
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    let userGrowthChart = new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: growthData.week.labels,
+            datasets: [{
+                label: 'New Users',
+                data: growthData.week.data,
+                borderColor: '#4cc9f0',
+                backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: 'white' } } },
+            scales: {
+                y: { beginAtZero: true, ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+        }
+    });
+    
+    // Update chart function
+    function updateGrowthChart(period) {
+        userGrowthChart.data.labels = growthData[period].labels;
+        userGrowthChart.data.datasets[0].data = growthData[period].data;
+        userGrowthChart.update();
+        
+        // Update active button
+        document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+    
+    // Quiz Performance Chart
+    const quizPerformanceCtx = document.getElementById('quizPerformanceChart').getContext('2d');
+    new Chart(quizPerformanceCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for stat in quiz_stats %}'{{ stat.topic }}'{% if not forloop.last %},{% endif %}{% empty %}'No Data'{% endfor %}],
+            datasets: [{
+                label: 'Quiz Attempts',
+                data: [{% for stat in quiz_stats %}{{ stat.count }}{% if not forloop.last %},{% endif %}{% empty %}0{% endfor %}],
+                backgroundColor: ['#4cc9f0', '#f72585', '#f9c74f', '#4361ee', '#7209b7', '#e63946', '#2a9d8f', '#e76f51'],
+                borderColor: ['#4cc9f0', '#f72585', '#f9c74f', '#4361ee', '#7209b7', '#e63946', '#2a9d8f', '#e76f51'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: 'white' } } },
+            scales: {
+                y: { beginAtZero: true, ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+        }
+    });
+    
+    // Performance Distribution Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for range in performance_ranges %}'{{ range.range }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for range in performance_ranges %}{{ range.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: ['#4cc9f0', '#f9c74f', '#f72585', '#4361ee', '#7209b7']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: 'white' } } }
+        }
+    });
+    
+    // Questions by Topic Chart
+    const questionsCtx = document.getElementById('questionsChart').getContext('2d');
+    new Chart(questionsCtx, {
+        type: 'pie',
+        data: {
+            labels: [{% for topic, count in question_stats.items %}'{{ topic }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for topic, count in question_stats.items %}{{ count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: ['#4cc9f0', '#f72585', '#f9c74f', '#4361ee', '#7209b7', '#e63946']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: 'white' } } }
+        }
+    });
+    </script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Requests - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .requests-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .request-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .request-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--warning);
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background: var(--warning); color: var(--dark); }
+        .status-approved { background: var(--success); color: var(--dark); }
+        .status-rejected { background: var(--danger); color: white; }
+        .status-completed { background: #28a745; color: white; }
+        
+        .request-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: var(--success);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-approve { background: var(--success); color: var(--dark); }
+        .btn-reject { background: var(--danger); color: white; }
+        .btn-generate { background: var(--primary); color: white; }
+        .btn-complete { background: #28a745; color: white; }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="{% url 'admindashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{% url 'content_moderation' %}"><i class="fas fa-shield-alt"></i> Content Moderation</a>
+            <a href="{% url 'analytics_view' %}"><i class="fas fa-chart-bar"></i> Analytics</a>
+        </div>
+
+        <div class="header">
+            <h1><i class="fas fa-clipboard-list"></i> Topic Requests</h1>
+            <p>Review and manage user topic requests</p>
+        </div>
+
+        {% if requests %}
+        <div class="requests-grid">
+            {% for req in requests %}
+            <div class="request-card">
+                <div class="request-header">
+                    <div class="request-title">{{ req.topic }}{% if req.subtopic %} - {{ req.subtopic }}{% endif %}</div>
+                    <span class="status-badge status-{{ req.status }}">{{ req.get_status_display }}</span>
+                </div>
+                
+                <div class="request-details">
+                    <div class="detail-row">
+                        <span class="detail-label">User:</span>
+                        <span>{{ req.user.username }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Difficulty:</span>
+                        <span>{{ req.difficulty }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Requested:</span>
+                        <span>{{ req.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% if req.description %}
+                    <div class="detail-row">
+                        <span class="detail-label">Description:</span>
+                        <span>{{ req.description }}</span>
+                    </div>
+                    {% endif %}
+                    {% if req.admin_notes %}
+                    <div class="detail-row">
+                        <span class="detail-label">Admin Notes:</span>
+                        <span>{{ req.admin_notes }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if req.status == 'pending' or req.status == 'approved' %}
+                <div class="actions">
+                    {% if req.status == 'pending' %}
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="request_id" value="{{ req.id }}">
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-approve">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    </form>
+                    
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="request_id" value="{{ req.id }}">
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="btn btn-reject">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="request_id" value="{{ req.id }}">
+                        <input type="hidden" name="action" value="generate_ai">
+                        <button type="submit" class="btn btn-generate" onclick="return confirm('Generate 50 AI questions for this topic?')">
+                            <i class="fas fa-robot"></i> Generate 50 AI Questions
+                        </button>
+                    </form>
+                    
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="request_id" value="{{ req.id }}">
+                        <input type="hidden" name="action" value="complete">
+                        <button type="submit" class="btn btn-complete">
+                            <i class="fas fa-check-circle"></i> Mark Complete
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No Topic Requests</h3>
+            <p>No topic requests have been submitted yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

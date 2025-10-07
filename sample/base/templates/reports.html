@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - SmartQuizzer Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .card-1 i { color: #fff; } .card-1 .number { color: #fff; }
+        .card-2 i { color: var(--success); } .card-2 .number { color: var(--success); }
+        .card-3 i { color: var(--accent); } .card-3 .number { color: var(--accent); }
+        .card-4 i { color: var(--warning); } .card-4 .number { color: var(--warning); }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .report-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .report-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+        }
+        
+        .report-card h3 i {
+            margin-right: 10px;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .user-table th,
+        .user-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .user-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .status-active {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .status-inactive {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .activity-meta {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .export-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .export-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: #ff4da6;
+            transform: translateY(-2px);
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: var(--accent);
+        }
+        
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 1024px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+            <div class="nav-links">
+                <a href="{% url 'admindashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'all_users' %}"><i class="fas fa-users"></i> Users</a>
+                <a href="{% url 'analytics_view' %}"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+
+        <div class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Admin Reports</h1>
+            <p>Comprehensive platform analytics and user management insights</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card card-1">
+                <i class="fas fa-users"></i>
+                <h3>Total Users</h3>
+                <p class="number">{{ total_users }}</p>
+            </div>
+            <div class="stat-card card-2">
+                <i class="fas fa-user-plus"></i>
+                <h3>New Users (30 days)</h3>
+                <p class="number">{{ new_users_month }}</p>
+            </div>
+            <div class="stat-card card-3">
+                <i class="fas fa-chart-line"></i>
+                <h3>Active Users</h3>
+                <p class="number">{{ active_users }}</p>
+            </div>
+            <div class="stat-card card-4">
+                <i class="fas fa-question-circle"></i>
+                <h3>Total Questions</h3>
+                <p class="number">{{ total_questions }}</p>
+            </div>
+        </div>
+
+        <!-- Reports Grid -->
+        <div class="reports-grid">
+            <!-- User Management Report -->
+            <div class="report-card">
+                <h3><i class="fas fa-users-cog"></i> User Management Overview</h3>
+                
+                <div class="filter-section">
+                    <button class="filter-btn active" onclick="filterUsers('all')">All Users</button>
+                    <button class="filter-btn" onclick="filterUsers('active')">Active</button>
+                    <button class="filter-btn" onclick="filterUsers('inactive')">Inactive</button>
+                    <button class="filter-btn" onclick="filterUsers('recent')">Recent</button>
+                </div>
+
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Quizzes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        {% for user in recent_users %}
+                        <tr data-status="{% if user.is_active %}active{% else %}inactive{% endif %}" data-date="{{ user.date_joined|date:'Y-m-d' }}">
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                            <td>{{ user.quiz_count|default:0 }}</td>
+                            <td class="status-{% if user.is_active %}active{% else %}inactive{% endif %}">
+                                {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="report-card">
+                <h3><i class="fas fa-clock"></i> Recent Platform Activity</h3>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New User Registration</div>
+                        <div class="activity-meta">{{ new_users_today }} users today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Quiz Attempts</div>
+                        <div class="activity-meta">{{ quizzes_today }} attempts today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Content Upload</div>
+                        <div class="activity-meta">{{ uploads_today|default:0 }} uploads today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">AI Generation</div>
+                        <div class="activity-meta">{{ ai_generations_today|default:0 }} generations today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Topic Requests</div>
+                        <div class="activity-meta">{{ pending_requests|default:0 }} pending requests</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Growth Chart -->
+        <div class="report-card">
+            <h3><i class="fas fa-chart-area"></i> User Growth Analytics</h3>
+            <div class="chart-container">
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3><i class="fas fa-download"></i> Export Reports</h3>
+            <p style="margin-bottom: 20px;">Download comprehensive reports for analysis</p>
+            <a href="#" class="export-btn" onclick="exportReport('users')">
+                <i class="fas fa-users"></i> Export User Report
+            </a>
+            <a href="#" class="export-btn" onclick="exportReport('quiz')">
+                <i class="fas fa-question-circle"></i> Export Quiz Report
+            </a>
+            <a href="#" class="export-btn" onclick="exportReport('activity')">
+                <i class="fas fa-chart-line"></i> Export Activity Report
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // User Growth Chart
+        const ctx = document.getElementById('userGrowthChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [12, 19, 15, 25, 22, 30, 28, 35, 32, 40, 38, 45],
+                    borderColor: '#4cc9f0',
+                    backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: 'white' } }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: { 
+                        ticks: { color: 'white' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+
+        // Filter Users Function
+        function filterUsers(filter) {
+            const rows = document.querySelectorAll('#userTableBody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter rows
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                const date = new Date(row.dataset.date);
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                let show = false;
+                
+                switch(filter) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'active':
+                        show = status === 'active';
+                        break;
+                    case 'inactive':
+                        show = status === 'inactive';
+                        break;
+                    case 'recent':
+                        show = date > thirtyDaysAgo;
+                        break;
+                }
+                
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Export Report Function
+        function exportReport(type) {
+            alert(`Exporting ${type} report... This feature will be implemented with backend integration.`);
+        }
+    </script>
+</body>
+</html>

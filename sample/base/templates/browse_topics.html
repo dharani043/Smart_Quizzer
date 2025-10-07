@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Topics - SmartQuizzer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{background:var(--gradient);color:var(--light);min-height:100vh}
+    .container{width:100%;max-width:1400px;margin:0 auto;padding:0 20px}
+    
+    /* Navigation */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    /* Header */
+    .page-header{text-align:center;margin-bottom:40px}
+    .page-header h1{font-size:2.5rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#4cc9f0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .page-header p{font-size:1.1rem;opacity:.8}
+    
+    /* Category Section */
+    .category-section{margin-bottom:50px}
+    .category-title{font-size:1.8rem;margin-bottom:25px;color:var(--warning);display:flex;align-items:center}
+    .category-title i{margin-right:10px}
+    
+    /* Topic Grid */
+    .topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;margin-bottom:40px}
+    .topic-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;border:1px solid rgba(255,255,255,.1);transition:all .3s ease;cursor:pointer;position:relative;overflow:hidden}
+    .topic-card:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(0,0,0,.2)}
+    .topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--success),var(--accent));opacity:.8}
+    
+    /* Status indicators */
+    .topic-card.mastered::before{background:linear-gradient(90deg,#4cc9f0,#06ffa5)}
+    .topic-card.in_progress::before{background:linear-gradient(90deg,#f9c74f,#f8961e)}
+    .topic-card.not_started::before{background:linear-gradient(90deg,#e63946,#f72585)}
+    
+    .topic-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}
+    .topic-name{font-size:1.4rem;font-weight:600;color:#fff}
+    .status-badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;text-transform:uppercase}
+    .status-badge.mastered{background:#4cc9f0;color:#000}
+    .status-badge.in_progress{background:#f9c74f;color:#000}
+    .status-badge.not_started{background:#e63946;color:#fff}
+    
+    .topic-stats{display:flex;gap:20px;margin-bottom:15px;font-size:.9rem}
+    .stat{display:flex;align-items:center;gap:5px;opacity:.8}
+    .stat i{color:var(--accent)}
+    
+    .subtopics{margin-bottom:20px}
+    .subtopics h4{font-size:.9rem;color:var(--warning);margin-bottom:8px}
+    .subtopic-tags{display:flex;flex-wrap:wrap;gap:6px}
+    .subtopic-tag{background:rgba(255,255,255,.1);padding:4px 8px;border-radius:12px;font-size:.75rem;color:rgba(255,255,255,.8)}
+    
+    .topic-actions{display:flex;gap:10px}
+    .btn{padding:8px 16px;border:none;border-radius:20px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .3s ease;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:#3651d4;transform:translateY(-2px)}
+    .btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+    .btn-secondary:hover{background:rgba(255,255,255,.2)}
+    
+    /* Learning Paths */
+    .learning-paths{margin-bottom:50px}
+    .paths-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:25px}
+    .path-card{background:linear-gradient(135deg,rgba(67,97,238,.2),rgba(118,75,162,.2));border:2px solid rgba(76,201,240,.3);border-radius:15px;padding:25px;transition:all .3s ease}
+    .path-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(76,201,240,.4)}
+    
+    .path-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}
+    .path-name{font-size:1.3rem;font-weight:600;color:#fff}
+    .path-level{background:var(--warning);color:#000;padding:4px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
+    
+    .path-description{margin-bottom:15px;opacity:.9;line-height:1.5}
+    .path-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+    .path-topic{background:rgba(255,255,255,.1);padding:6px 12px;border-radius:15px;font-size:.8rem}
+    
+    .path-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:.9rem;opacity:.8}
+    .path-actions{text-align:center}
+    
+    /* Responsive */
+    @media (max-width: 768px){
+      .topic-grid,.paths-grid{grid-template-columns:1fr}
+      .topic-stats{flex-direction:column;gap:8px}
+      .topic-actions{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'userdashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="{% url 'start_quiz' %}"><i class="fas fa-play"></i> Take Quiz</a>
+        <a href="{% url 'progress' %}"><i class="fas fa-chart-line"></i> Progress</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>📚 Browse Topics</h1>
+      <p>Explore subjects, track your progress, and choose your learning path</p>
+    </div>
+
+    <!-- Learning Paths -->
+    <div class="learning-paths">
+      <h2 class="category-title"><i class="fas fa-route"></i>Learning Paths</h2>
+      <div class="paths-grid">
+        {% for path in learning_paths %}
+        <div class="path-card">
+          <div class="path-header">
+            <h3 class="path-name">{{ path.name }}</h3>
+            <span class="path-level">{{ path.level }}</span>
+          </div>
+          <p class="path-description">{{ path.description }}</p>
+          <div class="path-topics">
+            {% for topic in path.topics %}
+            <span class="path-topic">{{ topic }}</span>
+            {% endfor %}
+          </div>
+          <div class="path-meta">
+            <span><i class="fas fa-clock"></i> {{ path.duration }}</span>
+            <span><i class="fas fa-book"></i> {{ path.topics|length }} Topics</span>
+          </div>
+          <div class="path-actions">
+            <a href="{% url 'learning_path_detail' path.name %}" class="btn btn-primary">
+              <i class="fas fa-info-circle"></i> View Details
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Topic Categories -->
+    {% for category, topics in topic_categories.items %}
+    <div class="category-section">
+      <h2 class="category-title">
+        {% if category == 'Programming' %}<i class="fas fa-code"></i>
+        {% elif category == 'Data Science' %}<i class="fas fa-chart-bar"></i>
+        {% elif category == 'Web Development' %}<i class="fas fa-globe"></i>
+        {% else %}<i class="fas fa-laptop-code"></i>{% endif %}
+        {{ category }}
+      </h2>
+      
+      <div class="topic-grid">
+        {% for topic in topics %}
+        <div class="topic-card {{ topic.status }}" onclick="startTopicQuiz('{{ topic.name }}')">
+          <div class="topic-header">
+            <h3 class="topic-name">{{ topic.name }}</h3>
+            <span class="status-badge {{ topic.status }}">
+              {% if topic.status == 'mastered' %}✅ Mastered
+              {% elif topic.status == 'in_progress' %}🟡 Learning
+              {% else %}🔴 New{% endif %}
+            </span>
+          </div>
+          
+          <div class="topic-stats">
+            <div class="stat">
+              <i class="fas fa-percentage"></i>
+              <span>{{ topic.avg_score|floatformat:0 }}% avg</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-play-circle"></i>
+              <span>{{ topic.total_attempts }} attempts</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-signal"></i>
+              <span>{{ topic.difficulty }}</span>
+            </div>
+          </div>
+          
+          <div class="subtopics">
+            <h4>Subtopics:</h4>
+            <div class="subtopic-tags">
+              {% for subtopic in topic.subtopics %}
+              <span class="subtopic-tag">{{ subtopic }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          
+          <div class="topic-actions">
+            <a href="{% url 'start_quiz' %}?topic={{ topic.name }}" class="btn btn-primary">
+              <i class="fas fa-play"></i> Take Quiz
+            </a>
+            <a href="{% url 'chatbot' %}?topic={{ topic.name }}" class="btn btn-secondary">
+              <i class="fas fa-robot"></i> Learn
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    function startTopicQuiz(topic) {
+      window.location.href = `{% url 'start_quiz' %}?topic=${encodeURIComponent(topic)}`;
+    }
+
+    // Add click animations
+    document.querySelectorAll('.topic-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        if (!e.target.closest('.topic-actions')) {
+          this.style.transform = 'scale(0.98)';
+          setTimeout(() => {
+            this.style.transform = '';
+          }, 150);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

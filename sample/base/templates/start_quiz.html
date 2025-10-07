@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Quiz - SmartQuizzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .subtopic-select {
+            display: none;
+        }
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Quiz Selection Form */
+        .quiz-selection {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        
+        .form-select option {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+        }
+        
+        .btn-start {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+        
+        .btn-start:hover {
+            background: #ff4da6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Topic Info */
+        .topic-info {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .topic-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--warning);
+        }
+        
+        .topic-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--success);
+            display: block;
+        }
+        
+        .stat .label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Level Progression Popup */
+        .progression-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .progression-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progression-icon {
+            font-size: 4rem;
+            color: var(--warning);
+            margin-bottom: 20px;
+        }
+        
+        .progression-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .progression-message {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .progression-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-current {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-current:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-next-level {
+            background: var(--accent);
+            color: white;
+            border: 2px solid var(--accent);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-next-level:hover {
+            background: #ff4da6;
+            border-color: #ff4da6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.3);
+        }
+        
+        .close-popup {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .close-popup:hover {
+            opacity: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .topic-stats {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .progression-content {
+                padding: 30px 20px;
+            }
+            
+            .progression-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+            <div class="nav-links">
+                <a href="{% url 'userdashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+                <a href="{% url 'history' %}"><i class="fas fa-history"></i> History</a>
+            </div>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Start a New Quiz</h1>
+            <p>Select a topic and subtopic to begin your AI-powered adaptive assessment</p>
+        </div>
+
+        <!-- Level Progression Popup -->
+        {% if progression_suggestion %}
+        <div class="progression-popup" id="progressionPopup">
+            <div class="progression-content">
+                <button class="close-popup" onclick="closeProgressionPopup()">&times;</button>
+                
+                {% if progression_suggestion.type == 'level_up' %}
+                    <div class="progression-icon">
+                        <i class="fas fa-level-up-alt"></i>
+                    </div>
+                    <h2 class="progression-title">Ready for Next Level?</h2>
+                {% elif progression_suggestion.type == 'next_topic' %}
+                    <div class="progression-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2 class="progression-title">Topic Mastered!</h2>
+                {% endif %}
+                
+                <p class="progression-message">{{ progression_suggestion.message }}</p>
+                
+                <div class="progression-buttons">
+                    <button class="btn-current" onclick="closeProgressionPopup()">
+                        <i class="fas fa-play"></i> Take Current Quiz
+                    </button>
+                    
+                    {% if progression_suggestion.type == 'level_up' %}
+                        <button class="btn-next-level" onclick="selectNextLevelWithTopic('{{ progression_suggestion.next_level }}', '{{ progression_suggestion.topic }}', '{{ progression_suggestion.subtopic }}')">
+                            <i class="fas fa-arrow-up"></i> Try {{ progression_suggestion.next_level }} Level
+                        </button>
+                    {% elif progression_suggestion.type == 'next_topic' %}
+                        <a href="{% url 'browse_topics' %}" class="btn-next-level">
+                            <i class="fas fa-compass"></i> Explore New Topics
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quiz Analysis Popup -->
+        {% if show_analysis %}
+        <div class="progression-popup" id="analysisPopup">
+            <div class="progression-content">
+                <button class="close-popup" onclick="closeAnalysisPopup()">&times;</button>
+                
+                {% if analysis.type == 'suggest_upgrade' %}
+                    <div class="progression-icon">
+                        <i class="fas fa-level-up-alt"></i>
+                    </div>
+                    <h2 class="progression-title">Level Up Suggestion!</h2>
+                {% elif analysis.type == 'suggest_downgrade' %}
+                    <div class="progression-icon">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                    </div>
+                    <h2 class="progression-title" style="color: var(--warning);">Build Foundation First!</h2>
+                {% elif analysis.type == 'topic_mastered' %}
+                    <div class="progression-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2 class="progression-title">Topic Mastered!</h2>
+                {% endif %}
+                
+                <p class="progression-message">{{ analysis.message }}</p>
+                
+                <div class="progression-buttons">
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="topic" value="{{ selected_topic }}">
+                        <input type="hidden" name="subtopic" value="{{ selected_subtopic }}">
+                        <input type="hidden" name="difficulty" value="{{ selected_difficulty }}">
+                        <input type="hidden" name="num_questions" value="{{ selected_questions }}">
+                        <input type="hidden" name="proceed" value="true">
+                        <button type="submit" class="btn-current">
+                            <i class="fas fa-play"></i> Continue {{ selected_difficulty }}
+                        </button>
+                    </form>
+                    
+                    {% if analysis.type == 'suggest_upgrade' %}
+                        <form method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="topic" value="{{ selected_topic }}">
+                            <input type="hidden" name="subtopic" value="{{ selected_subtopic }}">
+                            <input type="hidden" name="difficulty" value="{{ analysis.suggested_level }}">
+                            <input type="hidden" name="num_questions" value="{{ selected_questions }}">
+                            <input type="hidden" name="proceed" value="true">
+                            <button type="submit" class="btn-next-level">
+                                <i class="fas fa-arrow-up"></i> Try {{ analysis.suggested_level }} Level
+                            </button>
+                        </form>
+                    {% elif analysis.type == 'suggest_downgrade' %}
+                        <form method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="topic" value="{{ selected_topic }}">
+                            <input type="hidden" name="subtopic" value="{{ selected_subtopic }}">
+                            <input type="hidden" name="difficulty" value="{{ analysis.suggested_level }}">
+                            <input type="hidden" name="num_questions" value="{{ selected_questions }}">
+                            <input type="hidden" name="proceed" value="true">
+                            <button type="submit" class="btn-next-level" style="background: var(--warning); border-color: var(--warning);">
+                                <i class="fas fa-arrow-down"></i> Start {{ analysis.suggested_level }} Level
+                            </button>
+                        </form>
+                    {% elif analysis.type == 'topic_mastered' %}
+                        <a href="{% url 'browse_topics' %}" class="btn-next-level">
+                            <i class="fas fa-compass"></i> Explore New Topics
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if no_questions %}
+        <!-- No Questions Found Section -->
+        <div class="no-questions-card" style="background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 15px; padding: 30px; margin-bottom: 30px; text-align: center; border: 2px solid var(--danger);">
+            <div style="font-size: 3rem; color: var(--warning); margin-bottom: 20px;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2 style="color: var(--danger); margin-bottom: 15px;">Topic Not Available</h2>
+            <p style="margin-bottom: 20px; font-size: 1.1rem;">No questions found for <strong>{{ missing_topic }}</strong>
+                {% if missing_subtopic %} - {{ missing_subtopic }}{% endif %}
+                {% if missing_difficulty %} ({{ missing_difficulty }}){% endif %}
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'request_topic' %}?topic={{ missing_topic }}&subtopic={{ missing_subtopic }}&difficulty={{ missing_difficulty }}" 
+                   style="background: var(--primary); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.3s ease;">
+                    <i class="fas fa-plus-circle"></i> Request This Topic
+                </a>
+                <button type="button" onclick="location.reload()" 
+                        style="background: rgba(255,255,255,0.1); color: white; padding: 12px 25px; border: 2px solid rgba(255,255,255,0.2); border-radius: 25px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.3s ease;">
+                    <i class="fas fa-redo"></i> Try Different Topic
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quiz Selection Form -->
+        <form action="{% url 'start_quiz' %}" method="POST" class="quiz-selection">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="topic"><i class="fas fa-book"></i> Select Topic</label>
+                <select name="topic" id="topic" class="form-select" required onchange="updateSubtopics()">
+                    <option value="">-- Choose a Topic --</option>
+                    {% for topic in topics %}
+                    <option value="{{ topic }}">{{ topic }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" id="subtopic-group" style="display: none;">
+                <label for="subtopic"><i class="fas fa-tag"></i> Select Subtopic (Optional)</label>
+                <select name="subtopic" id="subtopic" class="form-select" onchange="updateDifficulties()">
+                    <option value="">-- Any Subtopic --</option>
+                    <!-- Subtopics will be populated by JavaScript -->
+                </select>
+            </div>
+            
+            <div class="form-group" id="difficulty-group" style="display: none;">
+                <label for="difficulty"><i class="fas fa-tasks"></i> Select Difficulty Level</label>
+                <select name="difficulty" id="difficulty" class="form-select">
+                    <option value="">-- Any Difficulty --</option>
+                    <!-- Difficulties will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="num_questions"><i class="fas fa-question-circle"></i> Number of Questions</label>
+                <select name="num_questions" id="num_questions" class="form-select" required>
+                    <option value="5">5 Questions</option>
+                    <option value="10" selected>10 Questions</option>
+                    <option value="15">15 Questions</option>
+                    <option value="20">20 Questions</option>
+                    <option value="25">25 Questions</option>
+                    <option value="50">All Questions (Max 50)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-start">
+                <i class="fas fa-play-circle"></i> Start Quiz
+            </button>
+        </form>
+
+        <!-- Request Topic Section -->
+        <div style="text-align: center; margin-top: 20px;margin-bottom: 20px;">
+            <p style="margin-bottom: 15px; opacity: 0.8;">Don't see the topic you're looking for?</p>
+            <a href="{% url 'request_topic' %}" 
+               style="background: rgba(255,255,255,0.1); color: white; padding: 12px 25px; border: 2px solid rgba(255,255,255,0.2); border-radius: 25px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.3s ease;">
+                <i class="fas fa-plus-circle"></i> Request New Topic
+            </a>
+        </div>
+
+        <!-- Topic Information -->
+        <div class="topic-info">
+            <h2><i class="fas fa-info-circle"></i> About Our Quizzes</h2>
+            <p>Our quizzes use adaptive AI technology to tailor questions to your skill level. The system will adjust the difficulty based on your performance, providing you with an optimal learning experience.</p>
+            
+            <div class="topic-stats">
+                <div class="stat">
+                    <span class="number">{{ total_questions }}+</span>
+                    <span class="label">Total Questions</span>
+                </div>
+                <div class="stat">
+                    <span class="number">{{ topics|length }}</span>
+                    <span class="label">Available Topics</span>
+                </div>
+                <div class="stat">
+                    <span class="number" id="subtopics-count">0</span>
+                    <span class="label">Subtopics</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Parse the topic-subtopics data from Django template
+        const topicSubtopics = JSON.parse('{{ topic_subtopics|escapejs }}');
+        const subtopicDifficulties = JSON.parse('{{ subtopic_difficulties|escapejs }}');
+        
+        function updateSubtopics() {
+            const topicSelect = document.getElementById('topic');
+            const subtopicSelect = document.getElementById('subtopic');
+            const subtopicsCount = document.getElementById('subtopics-count');
+            const subtopicGroup = document.getElementById('subtopic-group');
+            const difficultyGroup = document.getElementById('difficulty-group');
+            
+            const selectedTopic = topicSelect.value;
+            
+            // Clear existing subtopics
+            subtopicSelect.innerHTML = '<option value="">-- Any Subtopic --</option>';
+            
+            // Hide difficulty group when topic changes
+            difficultyGroup.style.display = 'none';
+            
+            if (selectedTopic && topicSubtopics[selectedTopic]) {
+                // Show subtopic selection
+                subtopicGroup.style.display = 'block';
+                
+                // Add subtopics for the selected topic
+                topicSubtopics[selectedTopic].forEach(subtopic => {
+                    const option = document.createElement('option');
+                    option.value = subtopic;
+                    option.textContent = subtopic;
+                    subtopicSelect.appendChild(option);
+                });
+                
+                // Update subtopics count
+                subtopicsCount.textContent = topicSubtopics[selectedTopic].length;
+            } else {
+                // Hide subtopic selection if no topic selected
+                subtopicGroup.style.display = 'none';
+                subtopicsCount.textContent = '0';
+            }
+        }
+        
+        function updateDifficulties() {
+            const topicSelect = document.getElementById('topic');
+            const subtopicSelect = document.getElementById('subtopic');
+            const difficultySelect = document.getElementById('difficulty');
+            const difficultyGroup = document.getElementById('difficulty-group');
+            
+            const selectedTopic = topicSelect.value;
+            const selectedSubtopic = subtopicSelect.value;
+            
+            // Clear existing difficulties
+            difficultySelect.innerHTML = '<option value="">-- Any Difficulty --</option>';
+            
+            if (selectedTopic && selectedSubtopic) {
+                const key = `${selectedTopic}_${selectedSubtopic}`;
+                
+                if (subtopicDifficulties[key] && subtopicDifficulties[key].length > 0) {
+                    // Show difficulty selection
+                    difficultyGroup.style.display = 'block';
+                    
+                    // Add difficulties for the selected topic and subtopic
+                    subtopicDifficulties[key].forEach(difficulty => {
+                        const option = document.createElement('option');
+                        option.value = difficulty;
+                        option.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+                        difficultySelect.appendChild(option);
+                    });
+                } else {
+                    // Hide difficulty selection if no difficulties available
+                    difficultyGroup.style.display = 'none';
+                }
+            } else {
+                // Hide difficulty selection if no subtopic selected
+                difficultyGroup.style.display = 'none';
+            }
+        }
+        
+        // Level progression popup functions
+        function closeProgressionPopup() {
+            const popup = document.getElementById('progressionPopup');
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+        
+        function closeAnalysisPopup() {
+            const popup = document.getElementById('analysisPopup');
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+        
+        function selectNextLevelWithTopic(nextLevel, topic, subtopic) {
+            // Auto-select topic
+            const topicSelect = document.getElementById('topic');
+            topicSelect.value = topic;
+            
+            // Update subtopics for selected topic
+            updateSubtopics();
+            
+            // Auto-select subtopic after a brief delay
+            setTimeout(() => {
+                const subtopicSelect = document.getElementById('subtopic');
+                if (subtopic && subtopic !== 'General') {
+                    subtopicSelect.value = subtopic;
+                }
+                
+                // Update difficulties
+                updateDifficulties();
+                
+                // Auto-select difficulty after another brief delay
+                setTimeout(() => {
+                    const difficultySelect = document.getElementById('difficulty');
+                    const difficultyGroup = document.getElementById('difficulty-group');
+                    
+                    // Show difficulty group
+                    difficultyGroup.style.display = 'block';
+                    
+                    // Add and select the next level
+                    const option = document.createElement('option');
+                    option.value = nextLevel;
+                    option.textContent = nextLevel;
+                    difficultySelect.appendChild(option);
+                    difficultySelect.value = nextLevel;
+                }, 100);
+            }, 100);
+            
+            // Close popup
+            closeProgressionPopup();
+            
+            // Scroll to form
+            document.querySelector('.quiz-selection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSubtopics();
+            
+            // Check for URL parameters to auto-fill form
+            const urlParams = new URLSearchParams(window.location.search);
+            const topicParam = urlParams.get('topic');
+            const subtopicParam = urlParams.get('subtopic');
+            const difficultyParam = urlParams.get('difficulty');
+            
+            if (topicParam) {
+                document.getElementById('topic').value = topicParam;
+                updateSubtopics();
+                
+                setTimeout(() => {
+                    if (subtopicParam) {
+                        document.getElementById('subtopic').value = subtopicParam;
+                        updateDifficulties();
+                    }
+                    
+                    setTimeout(() => {
+                        if (difficultyParam) {
+                            document.getElementById('difficulty').value = difficultyParam;
+                            document.getElementById('difficulty-group').style.display = 'block';
+                        }
+                    }, 100);
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

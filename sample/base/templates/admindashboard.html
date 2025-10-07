@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartQuizzer - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#4361ee 0%,#7209b7 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{
+      background:var(--gradient);
+      color:var(--light);min-height:100vh;
+    }
+    .container{width:100%;max-width:1600px;margin:0 auto;padding:0 20px}
+    
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    .dashboard-header{margin-bottom:30px}
+    .header-content{display:flex;justify-content:space-between;align-items:center}
+    .welcome-text h1{font-size:2.2rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#f72585);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .dashboard-actions a{color:white;text-decoration:none;margin-left:15px;padding:8px 15px;border-radius:20px;background:rgba(255,255,255,.2);transition:all .3s}
+    .dashboard-actions a:hover{background:rgba(255,255,255,.3)}
+    
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:25px;margin-bottom:40px}
+    .stat-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);text-align:center;transition:transform .3s;border:1px solid rgba(255,255,255,.1)}
+    .stat-card:hover{transform:translateY(-5px);}
+    .stat-card i{font-size:2.5rem;margin-bottom:15px}
+    .stat-card h3{font-size:1.2rem;margin-bottom:10px;color:rgba(255,255,255,.9)}
+    .stat-card .number{font-size:2.2rem;font-weight:700}
+    .card-1 i{color:#fff} .card-1 .number{color:#fff}
+    .card-2 i{color:var(--success)} .card-2 .number{color:var(--success)}
+    .card-3 i{color:var(--accent)} .card-3 .number{color:var(--accent)}
+    .card-4 i{color:var(--warning)} .card-4 .number{color:var(--warning)}
+    
+    .admin-section{margin-bottom:40px}
+    .section-title{font-size:1.5rem;margin-bottom:20px;color:rgba(255,255,255,.9);padding-bottom:10px;border-bottom:2px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;align-items:center}
+    .section-title a{font-size:1rem;color:var(--primary);text-decoration:none}
+    .action-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:20px}
+    .action-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);text-align:center;transition:all .3s;cursor:pointer;border:1px solid rgba(255,255,255,.1)}
+    .action-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+    .action-card i{font-size:2rem;margin-bottom:15px;color:#f9dc4f}
+    .action-card h3{font-size:1.2rem;margin-bottom:10px;color:rgba(255,255,255,.9)}
+    .action-card p{color:rgba(255,255,255,.7)}
+    
+    .data-table{width:100%;border-collapse:collapse;margin-top:20px;background:var(--card-bg);background-image: linear-gradient(80deg, #7209b7, #c739e669);backdrop-filter:blur(10px);border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.1)}
+    .data-table th, .data-table td{padding:15px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)}
+    .data-table th{background:rgba(0,0,0,.1);font-weight:600;color:rgba(255,255,255,.9)}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover{background:rgba(255,255,255,.05)}
+    .status-active{color:var(--success);font-weight:600}
+    .status-inactive{color:var(--danger);font-weight:600}
+    .btn-small{padding:5px 12px;border-radius:15px;border:none;cursor:pointer;font-size:.85rem}
+    .btn-edit{background:var(--success);color:white}
+    .btn-delete{background:var(--danger);color:white}
+    .period-btn.active{background:#4cc9f0 !important}
+    .period-btn:hover{background:rgba(255,255,255,0.3) !important}
+    
+    .chart-container{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:40px}
+    .chart-card{background:var(--card-bg);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.1)}
+    .chart-card h3{font-size:1.2rem;margin-bottom:20px;color:rgba(255,255,255,.9)}
+    .chart-placeholder{height:250px;background:rgba(0,0,0,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-style:italic}
+    
+    #subtopic::placeholder {
+      color: black;
+      opacity: 1;
+    }
+    .upload-form {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 20px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: rgba(255,255,255,.9);
+    }
+    
+    .form-group select, 
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 6px;
+      font-size: 16px;
+      background: rgba(0,0,0,.1);
+      color: white;
+    }
+    
+    .tab-btn.active {
+      background: rgba(255,255,255,0.2) !important;
+      color: white !important;
+    }
+    
+    .suggestions {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    
+    .suggestion-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      color: #333;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .suggestion-item:hover {
+      background: #f5f5f5;
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .file-input {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: 2px dashed #6a11cb;
+      border-radius: 8px;
+      text-align: center;
+      background-color: rgba(0,0,0,.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .file-input:hover {
+      background-color: rgba(0,0,0,.2);
+      border-color: #2575fc;
+    }
+    
+    .submit-btn{
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    
+    .success {
+      background-color: rgba(76, 201, 240, 0.2);
+      color: #4cc9f0;
+      border: 1px solid rgba(76, 201, 240, 0.3);
+    }
+    
+    .error {
+      background-color: rgba(230, 57, 70, 0.2);
+      color: #e63946;
+      border: 1px solid rgba(230, 57, 70, 0.3);
+    }
+    /* Messages/Alerts styling */
+.messages-container {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+.alert {
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-success {
+  background-color: rgba(76, 201, 240, 0.9);
+  border-left: 4px solid #4cc9f0;
+}
+.alert-error {
+  background-color: rgba(230, 57, 70, 0.9);
+  border-left: 4px solid #e63946;
+}
+.close-btn {
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 15px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1024px){
+  .chart-container{grid-template-columns:1fr}
+}
+@media (max-width: 768px){
+  .header-content{flex-direction:column;text-align:center;gap:15px}
+      .dashboard-actions{margin-top:15px}
+      .dashboard-grid{grid-template-columns:1fr}
+      .nav-links{flex-wrap:wrap;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+        <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+      {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+        <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="welcome-text">
+          <h1>Admin Dashboard</h1>
+          <p>Manage your SmartQuizzer platform</p>
+        </div>
+        <div class="dashboard-actions">
+          <a href="{% url 'reports' %}"><i class="fas fa-chart-bar"></i> Reports</a>
+          <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="stat-card card-1">
+        <i class="fas fa-users"></i>
+        <h3>Total Users</h3>
+        <p class="number">{{ total_users }}</p>
+        <!-- //{{ total_users }} -->
+      </div>
+      <div class="stat-card card-2">
+        <i class="fas fa-check-circle"></i>
+        <h3>Quizzes Today</h3>
+        <p class="number">{{ quizzes_today }}</p>
+        <!-- //{{ quizzes_today }} -->
+      </div>
+      <div class="stat-card card-3">
+        <i class="fas fa-chart-line"></i>
+        <h3>Avg. Score</h3>
+        <p class="number">{{ avg_score }}</p>
+        <!-- //{{ avg_score }} -->
+      </div>
+      <div class="stat-card card-4">
+        <i class="fas fa-server"></i>
+        <h3>System Status</h3>
+        <p class="number">Online</p>
+      </div>
+    </div>
+
+    <!-- MCQ Generator Tabs -->
+    <div class="admin-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,.08);">
+      <h2 class="section-title">📚 MCQ Generator</h2>
+      
+      <!-- Tab Navigation -->
+      <div class="tab-nav" style="display: flex; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.2);">
+        <button class="tab-btn active" onclick="switchTab('pdf')" id="pdfTab" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.2); color: white; border: none; cursor: pointer; border-radius: 10px 10px 0 0; margin-right: 5px; font-weight: 600;">📄 PDF MCQ Extractor</button>
+        <button class="tab-btn" onclick="switchTab('ai')" id="aiTab" style="flex: 1; padding: 15px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border: none; cursor: pointer; border-radius: 10px 10px 0 0; margin-left: 5px; font-weight: 600;">🤖 AI Quiz Generator</button>
+      </div>
+      
+      <!-- PDF Extractor Tab Content -->
+      <div id="pdfTabContent" class="tab-content">
+        <form id="pdfForm">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="pdfTopic">Topic</label>
+            <div style="position: relative;">
+              <input type="text" id="pdfTopic" name="topic" placeholder="Type topic (e.g., Python, Java, Machine Learning)" required style="background-image: linear-gradient(30deg, #c2c5d3,#bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;" autocomplete="off">
+              <div id="topicSuggestions" class="suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none;"></div>
+            </div>
+          </div>
+          
+          <div class="form-group" id="pdfSubtopicGroup" style="display: none;">
+            <label for="pdfSubtopic">Subtopic</label>
+            <input type="text" id="pdfSubtopic" name="subtopic" placeholder="e.g., Functions, Loops" required style="background-image: linear-gradient(30deg,#bf12f3, #c2c5d3);color:black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+          </div>
+          
+          <div class="form-group" id="pdfDifficultyGroup" style="display: none;">
+            <label for="pdfDifficulty">Difficulty Level</label>
+            <select id="pdfDifficulty" name="difficulty" required style="background-image: linear-gradient(30deg, #c2c5d3, #bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+              <option value="">Select Difficulty</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="pdfModeGroup" style="display: none;">
+            <label for="pdfMode">Extraction Mode</label>
+            <select id="pdfMode" name="mode" required style="background-image: linear-gradient(30deg, #c2c5d3, #bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+              <option value="">Select Mode</option>
+              <option value="pdf">📄 Direct PDF Extract (Structured Format)</option>
+              <option value="ai">🤖 AI Analysis (Any PDF Format)</option>
+            </select>
+          </div>
+          
+          <div id="pdfFileSection" style="display: none;">
+            <label for="pdfFile" class="file-input">
+              <input type="file" id="pdfFile" accept="application/pdf" style="display: none;" onchange="updatePdfFileName(this)">
+              <span id="pdfFileLabel">📄 Choose PDF file</span>
+            </label>
+          </div>
+          
+          <button type="button" id="extractBtn" class="submit-btn" style="display: none;">📄 Extract MCQs from PDF</button>
+        </form>
+        
+        <div id="pdfProcessing" style="display: none; text-align: center; padding: 30px;">
+          <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+          <p>🔄 Extracting MCQs from PDF...</p>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <a href="/view_admin_pdfs/" style="color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            📁 View Uploaded PDFs
+          </a>
+        </div>
+      </div>
+      
+      <!-- AI Generator Tab Content -->
+      <div id="aiTabContent" class="tab-content" style="display: none;">
+        <p style="margin-bottom: 20px; color: rgba(255,255,255,0.8);">Generate quizzes from online content using AI</p>
+        
+        <form id="aiForm">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="aiTopic">Topic</label>
+            <input type="text" id="aiTopic" name="topic" placeholder="e.g., Machine Learning, Data Structures" required style="background-image: linear-gradient(30deg, #c2c5d3,#bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+          </div>
+          
+          <div class="form-group" id="aiSubtopicGroup" style="display: none;">
+            <label for="aiSubtopic">Subtopic</label>
+            <input type="text" id="aiSubtopic" name="subtopic" placeholder="e.g., Neural Networks, Binary Trees" required style="background-image: linear-gradient(30deg,#bf12f3, #c2c5d3);color:black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+          </div>
+          
+          <div class="form-group" id="aiDifficultyGroup" style="display: none;">
+            <label for="aiDifficulty">Difficulty Level</label>
+            <select id="aiDifficulty" name="difficulty" required style="background-image: linear-gradient(30deg, #c2c5d3, #bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+              <option value="">Select Difficulty</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="aiNumQuestionsGroup" style="display: none;">
+            <label for="aiNumQuestions">Number of Questions</label>
+            <select id="aiNumQuestions" name="num_questions" required style="background-image: linear-gradient(30deg, #c2c5d3, #bf12f3);color: black;text-align: center; width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-size: 16px;">
+              <option value="">Select Number</option>
+              <option value="5">5 Questions</option>
+              <option value="10">10 Questions</option>
+              <option value="15">15 Questions</option>
+              <option value="20">20 Questions</option>
+            </select>
+          </div>
+          
+          <button type="button" id="aiGenerateBtn" class="submit-btn" style="display: none; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">🤖 Generate AI Quiz</button>
+        </form>
+        
+        <div id="aiProcessing" style="display: none; text-align: center; padding: 30px;">
+          <div style="border: 4px solid #f3f3f3; border-top: 4px solid #ff6b6b; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+          <p>🤖 AI is generating quiz questions...</p>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <a href="/view_ai_pdfs/" style="color: white; text-decoration: none; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            📁 View Generated PDFs
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style>
+
+    <div class="chart-container">
+      <div class="chart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3>User Growth</h3>
+          <div style="display: flex; gap: 5px;">
+            <button class="period-btn active" onclick="updateAdminChart('week')" style="padding: 5px 12px; background: #4cc9f0; color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Week</button>
+            <button class="period-btn" onclick="updateAdminChart('month')" style="padding: 5px 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Month</button>
+            <button class="period-btn" onclick="updateAdminChart('year')" style="padding: 5px 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Year</button>
+          </div>
+        </div>
+        <canvas id="userGrowthChart" width="400" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Quiz Performance</h3>
+        <canvas id="quizPerformanceChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // Admin Growth Data
+    const adminGrowthData = {
+        week: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: [{% for count in week_data %}{{ count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        },
+        month: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            data: [{% for count in month_data %}{{ count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        },
+        year: {
+            labels: [{% for i in "12345" %}{{ "now"|date:"Y"|add:i|add:"-5" }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            data: [{% for count in year_data %}{{ count }}{% if not forloop.last %},{% endif %}{% endfor %}]
+        }
+    };
+    
+    // User Growth Chart
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    let adminChart = new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: adminGrowthData.week.labels,
+            datasets: [{
+                label: 'New Users',
+                data: adminGrowthData.week.data,
+                borderColor: '#4cc9f0',
+                backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: 'white' } }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                },
+                x: { 
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                }
+            }
+        }
+    });
+    
+    // Update admin chart function
+    function updateAdminChart(period) {
+        adminChart.data.labels = adminGrowthData[period].labels;
+        adminChart.data.datasets[0].data = adminGrowthData[period].data;
+        adminChart.update();
+        
+        document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+    
+    // Quiz Performance Chart
+    const quizPerformanceCtx = document.getElementById('quizPerformanceChart').getContext('2d');
+    new Chart(quizPerformanceCtx, {
+        type: 'bar',
+        data: {
+            labels: ['DSA', 'Python', 'Java', 'Web Dev', 'Database'],
+            datasets: [{
+                label: 'Questions Available',
+                data: [{{ total_questions|add:"-50" }}, {{ total_questions|add:"-30" }}, {{ total_questions|add:"-20" }}, {{ total_questions|add:"-10" }}, {{ total_questions }}],
+                backgroundColor: [
+                    'rgba(76, 201, 240, 0.8)',
+                    'rgba(247, 37, 133, 0.8)',
+                    'rgba(249, 199, 79, 0.8)',
+                    'rgba(67, 97, 238, 0.8)',
+                    'rgba(114, 9, 183, 0.8)'
+                ],
+                borderColor: [
+                    '#4cc9f0',
+                    '#f72585',
+                    '#f9c74f',
+                    '#4361ee',
+                    '#7209b7'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: 'white' } }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                },
+                x: { 
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                }
+            }
+        }
+    });
+    </script>
+
+    <div class="admin-section">
+      <h2 class="section-title">Management Tools</h2>
+      <div class="action-grid">
+        <div class="action-card" onclick="location.href=`{% url 'all_users' %}`">
+          <i class="fas fa-user-cog"></i>
+          <h3>User Management</h3>
+          <p>View and manage all users</p>
+        </div>
+        <div class="action-card" onclick="location.href= `{% url 'content_moderation' %}`">
+          <i class="fas fa-database"></i>
+          <h3>Content Moderation</h3>
+          <p>Review AI-generated questions</p>
+        </div>
+        <div class="action-card" onclick="location.href=`{% url 'topic_requests_admin' %}`">
+          <i class="fas fa-clipboard-list"></i>
+          <h3>Topic Requests</h3>
+          <p>Review user topic requests & generate AI quizzes</p>
+        </div>
+        <div class="action-card" onclick="location.href=`{% url 'analytics_view' %}`">
+          <i class="fas fa-analytics"></i>
+          <h3>Advanced Analytics</h3>
+          <p>Detailed platform insights</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <h2 class="section-title">Recent Users <a href="{% url 'all_users' %}">View All</a></h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Joined</th>
+            <th>Quizzes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in recent_users %}
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+            <td>{{ user.quiz_count }}</td>
+            <td class="status-{% if user.is_active %}active{% else %}inactive{% endif %}">
+              {% if user.is_active %}Active{% else %}Inactive{% endif %}
+            </td>
+            <td>
+              <button class="btn-small btn-edit">Edit</button>
+              <button class="btn-small btn-delete">Delete</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="admin-section">
+      <h2 class="section-title">System Status</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Status</th>
+            <th>Version</th>
+            <th>Response Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Web Server</td>
+            <td class="status-active">Online</td>
+            <td>v2.4.1</td>
+            <td>128ms</td>
+          </tr>
+          <tr>
+            <td>Database</td>
+            <td class="status-active">Online</td>
+            <td>PostgreSQL 14</td>
+            <td>42ms</td>
+          </tr>
+          <tr>
+            <td>AI Model API</td>
+            <td class="status-active">Online</td>
+            <td>v3.2.0</td>
+            <td>356ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+  // Topic suggestions data
+  const topicSuggestions = [
+    'Python', 'Java', 'JavaScript', 'C++', 'C#', 'PHP', 'Ruby', 'Go', 'Rust', 'Swift',
+    'Machine Learning', 'Data Science', 'Artificial Intelligence', 'Deep Learning',
+    'Data Structures', 'Algorithms', 'Database Management', 'SQL', 'NoSQL', 'MongoDB',
+    'Web Development', 'Frontend Development', 'Backend Development', 'Full Stack',
+    'React', 'Angular', 'Vue.js', 'Node.js', 'Express.js', 'Django', 'Flask',
+    'HTML', 'CSS', 'Bootstrap', 'Tailwind CSS', 'SASS', 'LESS',
+    'Cloud Computing', 'AWS', 'Azure', 'Google Cloud', 'DevOps', 'Docker', 'Kubernetes',
+    'Cybersecurity', 'Network Security', 'Ethical Hacking', 'Penetration Testing',
+    'Mobile Development', 'Android', 'iOS', 'React Native', 'Flutter',
+    'Operating Systems', 'Linux', 'Windows', 'macOS', 'Unix',
+    'Software Engineering', 'Agile', 'Scrum', 'Project Management',
+    'Mathematics', 'Statistics', 'Calculus', 'Linear Algebra', 'Discrete Mathematics',
+    'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Information Technology'
+  ];
+  
+  function switchTab(tab) {
+    const pdfTab = document.getElementById('pdfTab');
+    const aiTab = document.getElementById('aiTab');
+    const pdfContent = document.getElementById('pdfTabContent');
+    const aiContent = document.getElementById('aiTabContent');
+    
+    if (tab === 'pdf') {
+      pdfTab.classList.add('active');
+      aiTab.classList.remove('active');
+      pdfTab.style.background = 'rgba(255,255,255,0.2)';
+      pdfTab.style.color = 'white';
+      aiTab.style.background = 'rgba(255,255,255,0.1)';
+      aiTab.style.color = 'rgba(255,255,255,0.7)';
+      pdfContent.style.display = 'block';
+      aiContent.style.display = 'none';
+    } else {
+      aiTab.classList.add('active');
+      pdfTab.classList.remove('active');
+      aiTab.style.background = 'rgba(255,255,255,0.2)';
+      aiTab.style.color = 'white';
+      pdfTab.style.background = 'rgba(255,255,255,0.1)';
+      pdfTab.style.color = 'rgba(255,255,255,0.7)';
+      aiContent.style.display = 'block';
+      pdfContent.style.display = 'none';
+    }
+  }
+  
+  function setupAutocomplete(inputId, suggestionsId) {
+    const input = document.getElementById(inputId);
+    const suggestionsDiv = document.getElementById(suggestionsId);
+    
+    input.addEventListener('input', function() {
+      const value = this.value.toLowerCase();
+      if (value.length < 2) {
+        suggestionsDiv.style.display = 'none';
+        return;
+      }
+      
+      const filtered = topicSuggestions.filter(topic => 
+        topic.toLowerCase().includes(value)
+      ).slice(0, 8);
+      
+      if (filtered.length > 0) {
+        suggestionsDiv.innerHTML = filtered.map(topic => 
+          `<div class="suggestion-item" onclick="selectSuggestion('${inputId}', '${topic}')">${topic}</div>`
+        ).join('');
+        suggestionsDiv.style.display = 'block';
+      } else {
+        suggestionsDiv.style.display = 'none';
+      }
+    });
+    
+    document.addEventListener('click', function(e) {
+      if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+        suggestionsDiv.style.display = 'none';
+      }
+    });
+  }
+  
+  function selectSuggestion(inputId, value) {
+    document.getElementById(inputId).value = value;
+    document.getElementById('topicSuggestions').style.display = 'none';
+    document.getElementById('pdfSubtopicGroup').style.display = 'block';
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    // Setup autocomplete for PDF topic
+    setupAutocomplete('pdfTopic', 'topicSuggestions');
+    
+    // PDF Extractor Form Logic
+    document.getElementById('pdfTopic').addEventListener('input', function() {
+      const subtopicGroup = document.getElementById('pdfSubtopicGroup');
+      if (this.value.trim()) {
+        subtopicGroup.style.display = 'block';
+      } else {
+        resetPdfForm();
+      }
+    });
+    
+    document.getElementById('pdfSubtopic').addEventListener('input', function() {
+      const difficultyGroup = document.getElementById('pdfDifficultyGroup');
+      if (this.value.trim()) {
+        difficultyGroup.style.display = 'block';
+      } else {
+        document.getElementById('pdfDifficultyGroup').style.display = 'none';
+        document.getElementById('pdfFileSection').style.display = 'none';
+        document.getElementById('extractBtn').style.display = 'none';
+      }
+    });
+    
+    document.getElementById('pdfDifficulty').addEventListener('change', function() {
+      const modeGroup = document.getElementById('pdfModeGroup');
+      if (this.value) {
+        modeGroup.style.display = 'block';
+      } else {
+        document.getElementById('pdfModeGroup').style.display = 'none';
+        document.getElementById('pdfFileSection').style.display = 'none';
+        document.getElementById('extractBtn').style.display = 'none';
+      }
+    });
+    
+    document.getElementById('pdfMode').addEventListener('change', function() {
+      const fileSection = document.getElementById('pdfFileSection');
+      if (this.value) {
+        fileSection.style.display = 'block';
+      } else {
+        document.getElementById('pdfFileSection').style.display = 'none';
+        document.getElementById('extractBtn').style.display = 'none';
+      }
+    });
+    
+    document.getElementById('pdfFile').addEventListener('change', function() {
+      const extractBtn = document.getElementById('extractBtn');
+      if (this.files.length > 0) {
+        extractBtn.style.display = 'block';
+      }
+    });
+    
+    document.getElementById('extractBtn').addEventListener('click', function() {
+      const topic = document.getElementById('pdfTopic').value;
+      const subtopic = document.getElementById('pdfSubtopic').value;
+      const difficulty = document.getElementById('pdfDifficulty').value;
+      const mode = document.getElementById('pdfMode').value;
+      const pdfFile = document.getElementById('pdfFile').files[0];
+      
+      if (!pdfFile) {
+        showMessage('Please select a PDF file', 'error');
+        return;
+      }
+      
+      extractPdfMCQs(topic, subtopic, difficulty, mode, pdfFile);
+    });
+    
+    // AI Generator Form Logic
+    document.getElementById('aiTopic').addEventListener('input', function() {
+      const subtopicGroup = document.getElementById('aiSubtopicGroup');
+      if (this.value.trim()) {
+        subtopicGroup.style.display = 'block';
+      } else {
+        resetAiForm();
+      }
+    });
+    
+    document.getElementById('aiSubtopic').addEventListener('input', function() {
+      const difficultyGroup = document.getElementById('aiDifficultyGroup');
+      if (this.value.trim()) {
+        difficultyGroup.style.display = 'block';
+      } else {
+        document.getElementById('aiDifficultyGroup').style.display = 'none';
+        document.getElementById('aiNumQuestionsGroup').style.display = 'none';
+        document.getElementById('aiGenerateBtn').style.display = 'none';
+      }
+    });
+    
+    document.getElementById('aiDifficulty').addEventListener('change', function() {
+      const numQuestionsGroup = document.getElementById('aiNumQuestionsGroup');
+      if (this.value) {
+        numQuestionsGroup.style.display = 'block';
+      } else {
+        document.getElementById('aiNumQuestionsGroup').style.display = 'none';
+        document.getElementById('aiGenerateBtn').style.display = 'none';
+      }
+    });
+    
+    document.getElementById('aiNumQuestions').addEventListener('change', function() {
+      const generateBtn = document.getElementById('aiGenerateBtn');
+      if (this.value) {
+        generateBtn.style.display = 'block';
+      } else {
+        generateBtn.style.display = 'none';
+      }
+    });
+    
+    document.getElementById('aiGenerateBtn').addEventListener('click', function() {
+      const topic = document.getElementById('aiTopic').value;
+      const subtopic = document.getElementById('aiSubtopic').value;
+      const difficulty = document.getElementById('aiDifficulty').value;
+      const numQuestions = document.getElementById('aiNumQuestions').value;
+      
+      generateAiQuiz(topic, subtopic, difficulty, numQuestions);
+    });
+  });
+  
+  function resetPdfForm() {
+    document.getElementById('pdfSubtopicGroup').style.display = 'none';
+    document.getElementById('pdfDifficultyGroup').style.display = 'none';
+    document.getElementById('pdfModeGroup').style.display = 'none';
+    document.getElementById('pdfFileSection').style.display = 'none';
+    document.getElementById('extractBtn').style.display = 'none';
+  }
+  
+  function resetAiForm() {
+    document.getElementById('aiSubtopicGroup').style.display = 'none';
+    document.getElementById('aiDifficultyGroup').style.display = 'none';
+    document.getElementById('aiNumQuestionsGroup').style.display = 'none';
+    document.getElementById('aiGenerateBtn').style.display = 'none';
+  }
+  
+  function extractPdfMCQs(topic, subtopic, difficulty, mode, pdfFile) {
+    document.getElementById('pdfProcessing').style.display = 'block';
+    
+    const formData = new FormData();
+    formData.append('topic', topic);
+    formData.append('subtopic', subtopic);
+    formData.append('difficulty', difficulty);
+    formData.append('mode', mode);
+    formData.append('pdf', pdfFile);
+    
+    fetch('/upload_mcq/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('pdfProcessing').style.display = 'none';
+      if (data.success) {
+        showMessage(`✅ ${data.message}`, 'success');
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        showMessage(`❌ ${data.error}`, 'error');
+      }
+    })
+    .catch(error => {
+      document.getElementById('pdfProcessing').style.display = 'none';
+      showMessage(`❌ Error: ${error.message}`, 'error');
+    });
+  }
+  
+  function generateAiQuiz(topic, subtopic, difficulty, numQuestions) {
+    document.getElementById('aiProcessing').style.display = 'block';
+    
+    const formData = new FormData();
+    formData.append('topic', topic);
+    formData.append('subtopic', subtopic);
+    formData.append('difficulty', difficulty);
+    formData.append('num_questions', numQuestions);
+    
+    fetch('/generate_ai_quiz/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('aiProcessing').style.display = 'none';
+      console.log('AI Generation Response:', data);
+      if (data.success) {
+        showMessage(`✅ ${data.message}`, 'success');
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        console.error('AI Generation Error:', data.error);
+        showMessage(`❌ ${data.error}`, 'error');
+      }
+    })
+    .catch(error => {
+      document.getElementById('aiProcessing').style.display = 'none';
+      console.error('Fetch Error:', error);
+      showMessage(`❌ Network Error: ${error.message}`, 'error');
+    });
+  }
+  
+  function showProcessing() {
+    document.getElementById('processing').style.display = 'block';
+    document.getElementById('resultMessage').style.display = 'none';
+  }
+  
+  function hideProcessing() {
+    document.getElementById('processing').style.display = 'none';
+  }
+  
+  function showMessage(message, type) {
+    // Create message container if it doesn't exist
+    let container = document.querySelector('.messages-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'messages-container';
+      document.body.appendChild(container);
+    }
+    
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type === 'success' ? 'success' : 'error'}`;
+    alert.innerHTML = `
+      ${message}
+      <span class="close-btn" onclick="this.parentElement.remove();">&times;</span>
+    `;
+    
+    // Add to container
+    container.appendChild(alert);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (alert.parentElement) {
+        alert.remove();
+      }
+    }, 5000);
+  }
+  
+  function updatePdfFileName(input) {
+    const fileLabel = document.getElementById('pdfFileLabel');
+    if (input.files.length > 0) {
+      fileLabel.textContent = `📄 ${input.files[0].name}`;
+    } else {
+      fileLabel.textContent = '📄 Choose PDF file';
+    }
+  }
+</script>
+</body>
+</html>

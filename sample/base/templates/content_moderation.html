@@ -1,0 +1,249 @@
+<!-- content_moderation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartQuizzer - Content Moderation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Copy the CSS from your admindashboard.html */
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#4361ee 0%,#7209b7 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{
+      background:var(--gradient);
+      color:var(--light);min-height:100vh;
+    }
+    .container{width:100%;max-width:1600px;margin:0 auto;padding:0 20px}
+    
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    .data-table{width:100%;border-collapse:collapse;margin-top:20px;background:var(--card-bg);background-image: linear-gradient(80deg, #7209b7, #c739e669);backdrop-filter:blur(10px);border-radius:10px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.1)}
+    .data-table th, .data-table td{padding:15px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)}
+    .data-table th{background:rgba(0,0,0,.1);font-weight:600;color:rgba(255,255,255,.9)}
+    .data-table tr:last-child td{border-bottom:none}
+    .data-table tr:hover{background:rgba(255,255,255,.05)}
+    .btn-small{padding:5px 12px;border-radius:15px;border:none;cursor:pointer;font-size:.85rem}
+    .btn-edit{background:var(--success);color:white}
+    .btn-delete{background:var(--danger);color:white}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'admindashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+
+    <div class="page-header" style="margin-bottom:30px">
+      <h1 style="font-size:2.5rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#f72585);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">🛡️ Content Moderation</h1>
+      <p style="color:rgba(255,255,255,.8);font-size:1.1rem">Review and manage all MCQ questions</p>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="search-filters" style="margin-bottom:20px;padding:20px;background:var(--card-bg);border-radius:15px;border:1px solid rgba(255,255,255,.1)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:15px;margin-bottom:15px">
+        <div>
+          <label style="display:block;margin-bottom:5px;color:rgba(255,255,255,.9);font-weight:500">🔍 Search Questions</label>
+          <input type="text" id="searchInput" placeholder="Search by question text..." style="width:100%;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(0,0,0,.1);color:white">
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:5px;color:rgba(255,255,255,.9);font-weight:500">📚 Filter by Topic</label>
+          <select id="topicFilter" style="width:100%;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(0,0,0,.1);color:white">
+            <option value="">All Topics</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:5px;color:rgba(255,255,255,.9);font-weight:500">📝 Filter by Subtopic</label>
+          <select id="subtopicFilter" style="width:100%;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(0,0,0,.1);color:white">
+            <option value="">All Subtopics</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:5px;color:rgba(255,255,255,.9);font-weight:500">⚙️ Filter by Difficulty</label>
+          <select id="difficultyFilter" style="width:100%;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(0,0,0,.1);color:white">
+            <option value="">All Difficulties</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button type="button" id="clearFilters" class="btn-small" style="background:var(--warning);color:white">🗑️ Clear Filters</button>
+        <button type="button" id="groupByTopic" class="btn-small" style="background:var(--accent);color:white">📁 Group by Topic</button>
+        <span id="resultCount" style="color:rgba(255,255,255,.7);margin-left:auto">{{ questions|length }} questions</span>
+      </div>
+    </div>
+    
+    <form method="POST" id="moderationForm">
+      {% csrf_token %}
+      
+      <div class="bulk-actions" style="margin-bottom:20px;display:flex;gap:15px;align-items:center;padding:15px;background:var(--card-bg);border-radius:10px">
+        <button type="button" id="selectAll" class="btn-small" style="background:var(--primary);color:white">✓ Select All</button>
+        <button type="submit" name="action" value="reject" class="btn-small btn-delete" onclick="return confirm('Are you sure you want to delete selected questions?')">✗ Delete Selected</button>
+        <span id="selectedCount" style="color:rgba(255,255,255,.7);margin-left:auto">0 selected</span>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:40px"><input type="checkbox" id="masterCheck"></th>
+            <th>Source</th>
+            <th>Topic</th>
+            <th>Subtopic</th>
+            <th>Difficulty</th>
+            <th>Question</th>
+            <th>Created</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for question in questions %}
+          <tr class="question-row" data-topic="{{ question.topic }}" data-subtopic="{{ question.subtopic }}" data-difficulty="{{ question.difficulty }}" data-question="{{ question.question|lower }}">
+            <td><input type="checkbox" name="question_ids" value="{{ question.id }}" class="question-check"></td>
+            <td><span class="source-badge" style="padding:4px 8px;border-radius:12px;font-size:0.8rem;{% if question.source == 'AI Generated' %}background:rgba(247, 37, 133, 0.3);color:#f72585{% else %}background:rgba(76, 201, 240, 0.3);color:#4cc9f0{% endif %}">{{ question.source }}</span></td>
+            <td>{{ question.topic }}</td>
+            <td>{{ question.subtopic }}</td>
+            <td><span class="difficulty-badge" style="padding:4px 8px;border-radius:12px;font-size:0.8rem;{% if question.difficulty == 'Easy' %}background:rgba(76, 201, 240, 0.3);color:#4cc9f0{% elif question.difficulty == 'Medium' %}background:rgba(249, 199, 79, 0.3);color:#f9c74f{% else %}background:rgba(230, 57, 70, 0.3);color:#e63946{% endif %}">{{ question.difficulty }}</span></td>
+            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ question.question }}">{{ question.question|truncatewords:8 }}</td>
+            <td>{{ question.created_at|date:"M d, Y" }}</td>
+            <td><span style="color:var(--success)">✓ Active</span></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" style="text-align: center;padding:40px;color:rgba(255,255,255,.6)">No questions found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const masterCheck = document.getElementById('masterCheck');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectAllBtn = document.getElementById('selectAll');
+        const searchInput = document.getElementById('searchInput');
+        const topicFilter = document.getElementById('topicFilter');
+        const subtopicFilter = document.getElementById('subtopicFilter');
+        const difficultyFilter = document.getElementById('difficultyFilter');
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        const groupByTopicBtn = document.getElementById('groupByTopic');
+        const resultCount = document.getElementById('resultCount');
+        
+        // Populate filter options
+        const allRows = document.querySelectorAll('.question-row');
+        const topics = new Set();
+        const subtopics = new Set();
+        
+        allRows.forEach(row => {
+            topics.add(row.dataset.topic);
+            subtopics.add(row.dataset.subtopic);
+        });
+        
+        topics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic;
+            option.textContent = topic;
+            topicFilter.appendChild(option);
+        });
+        
+        subtopics.forEach(subtopic => {
+            const option = document.createElement('option');
+            option.value = subtopic;
+            option.textContent = subtopic;
+            subtopicFilter.appendChild(option);
+        });
+        
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.question-check:checked').length;
+            selectedCount.textContent = `${checked} selected`;
+        }
+        
+        function filterQuestions() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const topicValue = topicFilter.value;
+            const subtopicValue = subtopicFilter.value;
+            const difficultyValue = difficultyFilter.value;
+            
+            let visibleCount = 0;
+            
+            allRows.forEach(row => {
+                const matchesSearch = !searchTerm || row.dataset.question.includes(searchTerm);
+                const matchesTopic = !topicValue || row.dataset.topic === topicValue;
+                const matchesSubtopic = !subtopicValue || row.dataset.subtopic === subtopicValue;
+                const matchesDifficulty = !difficultyValue || row.dataset.difficulty === difficultyValue;
+                
+                const isVisible = matchesSearch && matchesTopic && matchesSubtopic && matchesDifficulty;
+                
+                row.style.display = isVisible ? '' : 'none';
+                if (isVisible) visibleCount++;
+            });
+            
+            resultCount.textContent = `${visibleCount} questions`;
+            updateSelectedCount();
+        }
+        
+        // Event listeners
+        searchInput.addEventListener('input', filterQuestions);
+        topicFilter.addEventListener('change', filterQuestions);
+        subtopicFilter.addEventListener('change', filterQuestions);
+        difficultyFilter.addEventListener('change', filterQuestions);
+        
+        clearFiltersBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            topicFilter.value = '';
+            subtopicFilter.value = '';
+            difficultyFilter.value = '';
+            filterQuestions();
+        });
+        
+        groupByTopicBtn.addEventListener('click', function() {
+            location.href = '?group_by=topic';
+        });
+        
+        masterCheck.addEventListener('change', function() {
+            const visibleChecks = document.querySelectorAll('.question-row:not([style*="display: none"]) .question-check');
+            visibleChecks.forEach(check => {
+                check.checked = this.checked;
+            });
+            updateSelectedCount();
+        });
+        
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('question-check')) {
+                updateSelectedCount();
+            }
+        });
+        
+        selectAllBtn.addEventListener('click', function() {
+            const visibleChecks = document.querySelectorAll('.question-row:not([style*="display: none"]) .question-check');
+            const allChecked = Array.from(visibleChecks).every(c => c.checked);
+            visibleChecks.forEach(check => {
+                check.checked = !allChecked;
+            });
+            masterCheck.checked = !allChecked;
+            updateSelectedCount();
+            this.textContent = allChecked ? '✓ Select All' : '✗ Deselect All';
+        });
+        
+        updateSelectedCount();
+    });
+    </script>
+  </div>
+</body>
+</html>

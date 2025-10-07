@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartQuizzer - AI Generated PDFs</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    :root{
+      --primary:#4361ee;--secondary:#3a0ca3;--accent:#f72585;--light:#f8f9fa;--dark:#212529;--success:#4cc9f0;--warning:#f9c74f;--danger:#e63946;
+      --gradient:linear-gradient(135deg,#4361ee 0%,#7209b7 100%);
+      --card-bg:rgba(255,255,255,.1);
+    }
+    body{
+      background:var(--gradient);
+      color:var(--light);min-height:100vh;
+    }
+    .container{width:100%;max-width:1400px;margin:0 auto;padding:0 20px}
+    
+    nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:20px}
+    .logo{font-size:28px;font-weight:700;display:flex;align-items:center}
+    .logo i{color:var(--accent);margin-right:10px}
+    .nav-links{display:flex;gap:15px}
+    .nav-links a{color:var(--light);text-decoration:none;font-weight:500;padding:8px 16px;border-radius:50px;transition:all .3s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.1)}
+    
+    .page-header{margin-bottom:30px;text-align:center}
+    .page-header h1{font-size:2.5rem;margin-bottom:10px;background:linear-gradient(to right,#fff,#f72585);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .page-header p{color:rgba(255,255,255,.8);font-size:1.1rem}
+    
+    .back-btn{
+      display:inline-block;
+      margin-bottom:20px;
+      padding:10px 20px;
+      background:rgba(255,255,255,.2);
+      color:white;
+      text-decoration:none;
+      border-radius:25px;
+      transition:all .3s;
+    }
+    .back-btn:hover{background:rgba(255,255,255,.3)}
+    
+    .pdfs-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(350px, 1fr));
+      gap:25px;
+      margin-bottom:40px;
+    }
+    
+    .pdf-card{
+      background:var(--card-bg);
+      backdrop-filter:blur(10px);
+      border-radius:15px;
+      padding:25px;
+      box-shadow:0 5px 15px rgba(0,0,0,.08);
+      border:1px solid rgba(255,255,255,.1);
+      transition:transform .3s;
+    }
+    .pdf-card:hover{transform:translateY(-5px)}
+    
+    .pdf-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:15px;
+    }
+    
+    .pdf-title{
+      font-size:1.3rem;
+      font-weight:600;
+      color:white;
+      margin-bottom:5px;
+    }
+    
+    .pdf-subtitle{
+      color:rgba(255,255,255,.7);
+      font-size:0.9rem;
+    }
+    
+    .pdf-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:15px;
+    }
+    
+    .meta-tag{
+      padding:4px 12px;
+      border-radius:15px;
+      font-size:0.8rem;
+      font-weight:500;
+    }
+    
+    .difficulty-easy{background:rgba(76, 201, 240, 0.3);color:#4cc9f0}
+    .difficulty-medium{background:rgba(249, 199, 79, 0.3);color:#f9c74f}
+    .difficulty-hard{background:rgba(230, 57, 70, 0.3);color:#e63946}
+    
+    .questions-count{
+      background:rgba(255,255,255,.2);
+      color:white;
+    }
+    
+    .pdf-actions{
+      display:flex;
+      gap:10px;
+      margin-top:15px;
+    }
+    
+    .btn{
+      padding:8px 16px;
+      border:none;
+      border-radius:20px;
+      cursor:pointer;
+      text-decoration:none;
+      font-size:0.9rem;
+      font-weight:500;
+      transition:all .3s;
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+    }
+    
+    .btn-primary{
+      background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color:white;
+    }
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    
+    .btn-secondary{
+      background:rgba(255,255,255,.2);
+      color:white;
+    }
+    .btn-secondary:hover{background:rgba(255,255,255,.3)}
+    
+    .pdf-date{
+      color:rgba(255,255,255,.6);
+      font-size:0.8rem;
+      margin-top:10px;
+    }
+    
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:rgba(255,255,255,.7);
+    }
+    
+    .empty-state i{
+      font-size:4rem;
+      margin-bottom:20px;
+      color:rgba(255,255,255,.3);
+    }
+    
+    .empty-state h3{
+      font-size:1.5rem;
+      margin-bottom:10px;
+      color:rgba(255,255,255,.8);
+    }
+    
+    .stats-bar{
+      display:flex;
+      justify-content:center;
+      gap:30px;
+      margin-bottom:30px;
+      padding:20px;
+      background:var(--card-bg);
+      backdrop-filter:blur(10px);
+      border-radius:15px;
+      border:1px solid rgba(255,255,255,.1);
+    }
+    
+    .stat-item{
+      text-align:center;
+    }
+    
+    .stat-number{
+      font-size:2rem;
+      font-weight:700;
+      color:var(--accent);
+    }
+    
+    .stat-label{
+      color:rgba(255,255,255,.8);
+      font-size:0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+      <div class="nav-links">
+        <a href="{% url 'admindashboard' %}"><i class="fas fa-dashboard"></i> Dashboard</a>
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container">
+    <a href="{% url 'admindashboard' %}" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    
+    <div class="page-header">
+      <h1>🤖 AI Generated PDFs</h1>
+      <p>Manage your AI-generated quiz PDFs</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-number">{{ ai_pdfs.count }}</div>
+        <div class="stat-label">Total PDFs</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ ai_pdfs|length|add:0 }}</div>
+        <div class="stat-label">This Month</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{% for pdf in ai_pdfs %}{{ pdf.num_questions|add:0 }}{% empty %}0{% endfor %}</div>
+        <div class="stat-label">Questions Generated</div>
+      </div>
+    </div>
+
+    {% if ai_pdfs %}
+      <div class="pdfs-grid">
+        {% for pdf in ai_pdfs %}
+        <div class="pdf-card">
+          <div class="pdf-header">
+            <div>
+              <div class="pdf-title">{{ pdf.topic }}</div>
+              <div class="pdf-subtitle">{{ pdf.subtopic }}</div>
+            </div>
+            <i class="fas fa-file-pdf" style="font-size:2rem;color:#e74c3c;"></i>
+          </div>
+          
+          <div class="pdf-meta">
+            <span class="meta-tag difficulty-{{ pdf.difficulty|lower }}">
+              {{ pdf.difficulty }}
+            </span>
+            <span class="meta-tag questions-count">
+              {{ pdf.num_questions }} Questions
+            </span>
+          </div>
+          
+          <div class="pdf-actions">
+            <a href="{{ pdf.pdf_file.url }}" target="_blank" class="btn btn-primary">
+              <i class="fas fa-download"></i> Download PDF
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="previewPdf('{{ pdf.pdf_file.url }}')">
+              <i class="fas fa-eye"></i> Preview
+            </a>
+          </div>
+          
+          <div class="pdf-date">
+            Created: {{ pdf.created_at|date:"M d, Y H:i" }} by {{ pdf.created_by.username }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-robot"></i>
+        <h3>No AI PDFs Generated Yet</h3>
+        <p>Start generating AI-powered quizzes from the dashboard</p>
+        <a href="{% url 'admindashboard' %}" class="btn btn-primary" style="margin-top:20px;">
+          <i class="fas fa-plus"></i> Generate First Quiz
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function previewPdf(url) {
+      window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    }
+  </script>
+</body>
+</html>

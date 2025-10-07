@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz History - SmartQuizzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #e63946;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: var(--gradient);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #bdf725);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        /* Filter Controls */
+        .filter-controls {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .filter-select option {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+        }
+        
+        /* Quiz History Cards */
+        .history-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .history-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--warning);
+        }
+        
+        .quiz-meta {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .score-display {
+            text-align: right;
+        }
+        
+        .score-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .score-number.excellent { color: var(--success); }
+        .score-number.good { color: var(--warning); }
+        .score-number.needs-improvement { color: var(--danger); }
+        
+        .score-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: block;
+        }
+        
+        .stat-value.correct { color: var(--success); }
+        .stat-value.wrong { color: var(--danger); }
+        .stat-value.total { color: var(--primary); }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* Difficulty Badge */
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .difficulty-badge.easy {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .difficulty-badge.medium {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .difficulty-badge.hard {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .empty-text {
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #ff4da6;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .score-display {
+                text-align: left;
+            }
+            
+            .quiz-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo"><i class="fas fa-brain"></i><span>SmartQuizzer</span></div>
+            <div class="nav-links">
+                <a href="{% url 'userdashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'start_quiz' %}"><i class="fas fa-play"></i> Take Quiz</a>
+                <a href="{% url 'progress' %}"><i class="fas fa-chart-line"></i> Progress</a>
+                <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+        </nav>
+
+        <div class="page-header">
+            <h1><i class="fas fa-history"></i> Quiz History</h1>
+            <p>Review your past quiz attempts and track your improvement over time</p>
+        </div>
+
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label for="topic-filter">Filter by Topic</label>
+                <select id="topic-filter" class="filter-select" onchange="filterHistory()">
+                    <option value="">All Topics</option>
+                    <option value="Python">Python</option>
+                    <option value="Java">Java</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="SQL">SQL</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="score-filter">Filter by Score</label>
+                <select id="score-filter" class="filter-select" onchange="filterHistory()">
+                    <option value="">All Scores</option>
+                    <option value="excellent">80% and above</option>
+                    <option value="good">60% - 79%</option>
+                    <option value="needs-improvement">Below 60%</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="date-filter">Filter by Date</label>
+                <select id="date-filter" class="filter-select" onchange="filterHistory()">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="history-grid" id="history-grid">
+            {% for quiz in quiz_history %}
+            <div class="history-card" data-topic="{{ quiz.topic }}" data-score="{{ quiz.score }}" data-date="{{ quiz.attempt_date|date:'Y-m-d' }}">
+                <div class="card-header">
+                    <div class="quiz-info">
+                        <h3>{{ quiz.topic }} Quiz</h3>
+                        <div class="quiz-meta">
+                            <span><i class="fas fa-calendar"></i> {{ quiz.attempt_date|date:"M d, Y" }}</span>
+                            <span><i class="fas fa-clock"></i> {{ quiz.subtopic|default:"General" }}</span>
+                            <span class="difficulty-badge medium">Medium</span>
+                        </div>
+                    </div>
+                    <div class="score-display">
+                        <span class="score-number {% if quiz.score >= 80 %}excellent{% elif quiz.score >= 60 %}good{% else %}needs-improvement{% endif %}">{{ quiz.score|floatformat:1 }}%</span>
+                        <span class="score-label">Final Score</span>
+                    </div>
+                </div>
+                
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <span class="stat-value correct">{{ quiz.correct_answers }}</span>
+                        <span class="stat-label">Correct</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value wrong">{{ quiz.wrong_answers }}</span>
+                        <span class="stat-label">Wrong</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value total">{{ quiz.total_questions }}</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ quiz.attempt_date|timesince }}</span>
+                        <span class="stat-label">Ago</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-history empty-icon"></i>
+                <h2 class="empty-title">No Quiz History Yet</h2>
+                <p class="empty-text">You haven't taken any quizzes yet. Start your learning journey today!</p>
+                <a href="{% url 'start_quiz' %}" class="cta-button">
+                    <i class="fas fa-play"></i> Take Your First Quiz
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function filterHistory() {
+            const topicFilter = document.getElementById('topic-filter').value;
+            const scoreFilter = document.getElementById('score-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+            const cards = document.querySelectorAll('.history-card');
+            
+            cards.forEach(card => {
+                let show = true;
+                
+                if (topicFilter && card.dataset.topic !== topicFilter) {
+                    show = false;
+                }
+                
+                if (scoreFilter) {
+                    const score = parseFloat(card.dataset.score);
+                    if (scoreFilter === 'excellent' && score < 80) show = false;
+                    if (scoreFilter === 'good' && (score < 60 || score >= 80)) show = false;
+                    if (scoreFilter === 'needs-improvement' && score >= 60) show = false;
+                }
+                
+                if (dateFilter) {
+                    const cardDate = new Date(card.dataset.date);
+                    const today = new Date();
+                    const diffTime = Math.abs(today - cardDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (dateFilter === 'today' && diffDays > 1) show = false;
+                    if (dateFilter === 'week' && diffDays > 7) show = false;
+                    if (dateFilter === 'month' && diffDays > 30) show = false;
+                }
+                
+                card.style.display = show ? 'block' : 'none';
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.history-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
