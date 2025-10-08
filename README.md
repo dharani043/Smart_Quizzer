@@ -42,7 +42,6 @@ A comprehensive Django-based quiz application with AI-powered features, gamifica
 - **Timer System**: 5-minute countdown per question with visual warnings and auto-submit
 - **Confidence Rating**: Rate confidence level for each answer for better analytics
 - **Keyboard Shortcuts**: A/B/C/D keys for quick selection, Enter to submit
-- **Auto-submit**: Automatic submission when time runs out with grace period
 
 ### 👥 User Management
 - **Role-Based Access**: Separate admin and user interfaces with proper authorization
@@ -51,8 +50,6 @@ A comprehensive Django-based quiz application with AI-powered features, gamifica
 - **Content Moderation**: Advanced question management with bulk operations and search
 - **User Settings**: Multi-section settings interface (Profile, Security, Preferences, Notifications)
 - **Password Security**: Secure password change functionality with validation
-- **Notification Controls**: Email notifications, achievement alerts, and weekly reports
-- **Data Management**: Export data and account deletion options with privacy controls
 - **Block/Unblock Users**: Admin functionality to manage user access and behavior
 
 ### 📱 Modern UI/UX
@@ -63,8 +60,6 @@ A comprehensive Django-based quiz application with AI-powered features, gamifica
 - **Accessibility**: Keyboard navigation, screen reader support, and high contrast
 - **Tab-Based Interface**: Clean separation between PDF extractor and AI generator
 - **Real-time Updates**: Live data visualization with Chart.js and automatic refresh
-- **Interactive Charts**: Period selection for analytics (week/month/year) with smooth transitions
-- **Empty States**: Encouraging messages for new users with call-to-action buttons
 
 ## 🚀 Installation & Setup
 
@@ -75,8 +70,8 @@ A comprehensive Django-based quiz application with AI-powered features, gamifica
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/smartquizzer.git
-cd smartquizzer
+git clone https://github.com/dharani043/Smart_Quizzer.git
+cd Smart_Quizzer
 ```
 
 ### 2. Create Virtual Environment
@@ -130,17 +125,7 @@ smartquizzer/
 │   ├── ai_quiz_generator.py       # AI quiz generation with PDF creation
 │   ├── llm_client.py             # Google Gemini AI client integration
 │   ├── utils.py                   # PDF extraction utilities
-│   ├── dashboard_ai.py            # Dashboard AI recommendations
 │   └── templates/                 # HTML templates
-│       ├── userdashboard.html     # User dashboard with AI insights
-│       ├── admindashboard.html    # Admin dashboard with analytics
-│       ├── start_quiz.html        # Quiz selection with level progression
-│       ├── quiz_question.html     # Quiz interface with timer
-│       ├── progress.html          # Progress tracking with charts
-│       ├── analytics.html         # Real-time analytics dashboard
-│       ├── browse_topics.html     # Topic exploration interface
-│       ├── chatbot.html          # AI learning assistant
-│       └── all_users.html        # User management interface
 ├── sample/                        # Django project settings
 │   ├── settings.py               # Configuration with caching
 │   └── urls.py                   # Complete URL routing
@@ -148,7 +133,6 @@ smartquizzer/
 ├── static/                       # Static assets (CSS, JS, images)
 ├── requirements.txt              # Python dependencies
 ├── .env.example                  # Environment template
-├── .gitignore                    # Git ignore file
 └── README.md                     # This file
 ```
 
@@ -161,8 +145,6 @@ smartquizzer/
 - **Content Moderation**: Question management with search, filtering, and bulk operations
 - **Topic Request Management**: Handle user requests with AI auto-generation capabilities
 - **PDF Management**: Separate views for admin uploaded and AI-generated PDFs with export
-- **Export Functionality**: Export questions as PDF with answer keys and formatting
-- **User Growth Tracking**: Interactive charts showing user registration trends
 
 ### User Features
 - **Adaptive Quiz System**: Smart difficulty progression with foundation checks and warnings
@@ -172,8 +154,6 @@ smartquizzer/
 - **Learning Paths**: Structured progression with auto-topic selection and module tracking
 - **Browse Topics**: Comprehensive topic exploration with progress indicators and categories
 - **Topic Requests**: Request missing topics for AI generation with admin approval workflow
-- **Level Progression**: Intelligent popup recommendations based on performance analysis
-- **Settings Management**: Comprehensive user preferences and notification controls
 
 ## 🔧 Configuration
 
@@ -188,7 +168,6 @@ smartquizzer/
 - **Bonus XP**: 5 points for 80%+ scores
 - **Streak Multiplier**: 1.5x for daily streaks
 - **Achievement System**: Unlock badges for various accomplishments
-- **Leaderboards**: Compete with other learners
 
 ### AI Features Configuration
 - **Google Gemini AI**: Powers quiz generation and insights
@@ -218,49 +197,5 @@ export GOOGLE_AI_API_KEY="your-api-key"
 
 This project is licensed under the MIT License.
 
-## 🆘 Support
-
-For support:
-- Create an issue on GitHub
-- Check the documentation
-
-## 🔄 Version History
-
-### v3.0.0 (Current)
-- **Enhanced AI Features**: Google Gemini integration for quiz generation and insights
-- **Advanced Gamification**: XP system, achievements, leaderboards, and streak tracking
-- **Real-time Analytics**: Interactive dashboards with Chart.js visualizations
-- **Level Progression**: Intelligent difficulty advancement with foundation checks
-- **Learning Paths**: Structured topic progression with auto-selection
-- **Topic Browsing**: Comprehensive exploration with progress tracking
-- **User Management**: Admin tools for editing and blocking users
-- **Content Moderation**: Advanced question management with bulk operations
-- **Performance Optimization**: Intelligent caching and real-time data
-- **Modern UI/UX**: Responsive design with interactive elements
-
-### v2.0.0
-- AI-powered features with Google Gemini integration
-- Advanced gamification system
-- Real-time analytics dashboard
-- Level progression system
-- Learning paths and topic browsing
-
-### v1.0.0
-- Basic quiz functionality
-- User authentication
-- Admin panel
-- PDF question extraction
-
-## 🙏 Acknowledgments
-
-- **Google Gemini AI** for intelligent quiz generation and insights
-- **Chart.js** for interactive data visualization
-- **Font Awesome** for comprehensive icon library
-- **ReportLab** for PDF generation capabilities
-- **Django** community for the excellent web framework
-- **PyMySQL** for MySQL database connectivity
-- **Bootstrap** for responsive UI components
-
----
 
 **Made with ❤️ for better learning experiences**
